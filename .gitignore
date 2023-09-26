@@ -2,11 +2,20 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.DS_Store
 
 # C extensions
 *.so
 
+.Rhistory
 # Distribution / packaging
+TP2-arbres_de_decision.html
+TP2-arbres_de_decision_files/
+TP1/
+TP3/
+TP4/
+cours/
+supplément
 .Python
 build/
 develop-eggs/
