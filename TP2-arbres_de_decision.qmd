@@ -20,17 +20,17 @@ date: 2023-09-19
 ## Classification avec les arbres
 <a name="Classification avec les arbres"></a>
 
-Dans toute la suite, nous fixerons une graine pour pouvoir discuter des résultats plus simplement car sinon c'est aléatoire et nous n'obtenons pas exactement pareil à chaque simulation.
+Dans toute la suite, nous fixerons une graine pour pouvoir discuter des résultats plus simplement car c'est aléatoire donc nous pouvons ne pas obtenir exactement les mêmes résultats à chaque simulation.
 
 ### Question 1 <a name="Question 1"></a>
 
-Dans le cadre de la régression, lorsque l'on cherche à prédire une valeur numérieque pour $Y$, on peut utiliser la variance comme moyen de mesurer l'homogénéité. En effet, plus la variance entre les données est élevée plus les données sont hétérogènes, plus elle est faible et plus les données sont homogènes. 
+Dans le cadre de la régression, lorsque l'on cherche à prédire une valeur numérique pour $Y$, on peut utiliser la variance comme moyen de mesurer l'homogénéité. En effet, plus la variance entre les données est élevée plus les données sont hétérogènes, plus elle est faible et plus les données sont homogènes. 
 
 ### Question 2 <a name="Question 2"></a>
 
-Dans un premier temps, créons deux arbres de décision avec les critères de classification suivant : indice de gini et l'entropie. Nous simulons ensuite avec `rand_checkers` un échantillon de taille $n=456$. 
+Dans un premier temps, créons deux arbres de décision avec les critères de classification suivants : l'indice de gini et l'entropie. Nous simulons ensuite avec `rand_checkers` un échantillon de taille $n=456$. 
 
-On partitionne ensuite en 2 sous-ensembles pour avoir un sous-échantillon d'entrainement et un sous-échantillon de test. 
+On partitionne ensuite en 2 sous-ensembles pour avoir un ensemble d'entrainement et un ensemble de test. 
 
 ```{python}
 #| echo: FALSE
@@ -67,7 +67,7 @@ print("error with gini criterion :", 1-dt_gini.score(X_train, Y_train))
 print("error with entropy criterion :", 1-dt_entropy.score(X_train, Y_train))
 ```
 
-On a regardé les erreurs pour l'indice de gini et l'entropie sur les données d'entrainements et nous obtenons 0 pour les deux. En effet, nous avons le même échantillon pour les variables à prédire que pour les observations, donc nous apprenons très bien sur cet échantillon. Nous pourrions regarder pour quelle profondeur nous obtenons $0$. Probablement que l'algorithme s'arrête lorsque l'on atteint cette valeur ($1$ en l'occurence car il raisonne en terme de score).
+Nous avons regardé les erreurs pour l'indice de gini et l'entropie sur les données d'entrainements et nous obtenons 0 pour les deux. En effet, nous avons le même échantillon pour les variables à prédire que pour les observations, donc nous apprenons très bien sur cet échantillon. Nous pourrions regarder pour quelle profondeur nous obtenons $0$. Probablement que l'algorithme s'arrête lorsque l'on atteint cette valeur ($1$ en l'occurence car il raisonne en terme de score).
 
 ```{python}
 #| echo: FALSE
@@ -106,9 +106,11 @@ print("Error with Gini criterion: ", 1-scores_gini)
 
 ```
 
-Lorsque l'on regarde l'erreur pour différentes profondeurs de l'arbre, on se rend compte que plus il est profond plus l'on se rapproche de $0$. On a pris max_depth=$12$, puisqu'après le erreur vaut $0$. Les courbes des erreurs décroient très vite à partir de depth=$4$ et l'on voit que pour depth=$12$ on est très proche de $0$. 
+Lorsque l'on regarde l'erreur pour différentes profondeurs de l'arbre, on se rend compte que plus il est profond plus l'on se rapproche de $0$. Ici nous avons pris max_depth=$12$. En effet au-delà de cette valeur l'erreur est nulle ou presque. Nous pouvons le visualiser sur les courbes.
 
-On peut noter également que si l'on prend un arbre avec une petite profondeur, l'erreur est très élevée car si les données sont bien réparties et que l'on ne peut faire qu'une coupe par exemple, nous aurons deux classes très hétérogènes. 
+On peut noter également que si l'on prend un arbre avec une petite profondeur, l'erreur est très élevée car si les données sont bien réparties et que l'on ne peut faire qu'une coupe par exemple, nous aurons deux classes très hétérogènes.
+
+Nous avons également afficher les frontières et nous pouvons observer une belle classification des données lorsque la profondeur est élevée. 
 
 ### Question 3 <a name="Question 3"></a>
 
@@ -154,7 +156,7 @@ graph.render("./arbre/arbre", format='png')
 
 <img src='code/arbre/arbre.png' width=800>
 
-Un arbre de décision est assez simple à lire. Tout d'abord il se compose d'un noeud dit "racine" qui est le tout premier noeud de l'arbre puis de deux noeuds enfants. Chaque noeud non-terminal possède à son tour deux noeuds enfants. Puis nous arrivons après un certain nombre de feuilles aux noeuds terminaux avec les décisions. 
+Un arbre de décision est assez simple à lire. Tout d'abord il se compose d'un noeud dit "racine" qui est le tout premier noeud de l'arbre puis de deux noeuds enfants. Chaque noeud non-terminal possède à son tour deux noeuds enfants. Puis nous arrivons, après un certain nombre de feuilles, aux noeuds terminaux avec les décisions. 
 
 Si la condition au noeud $k$ est vérifiée alors on suit la branche de gauche, sinon on suit celle de droite. 
 
@@ -174,11 +176,11 @@ $\bullet$ samples=$448$ : il y a pour commencer $448$ données
 
 $\bullet$ value=$[112,112,112,112]$ : il y a $112$ valeurs dans chaque classe
 
-Si la condition est vérifiée je vais donc à droite et cette fois j'ai plus que $407$ données, une entropie de $1.999$ sur ces données puis $98$ données dans la classe $1$, $104$ dans la classe $2$, $107$ dans la classe $3$ et $98$ dans la dernière. 
+Si la condition est vérifiée je vais donc à gauche et cette fois j'ai plus que $407$ données, une entropie de $1.999$ sur ces données puis $98$ données dans la classe $1$, $104$ dans la classe $2$, $107$ dans la classe $3$ et $98$ dans la dernière. 
 
 ### Question 5 <a name="Question 5"></a>
 
-Nous allons à présent créer $n=160$ nouvelles données que nous allons utiliser comme données de test. Nous alons calculer la proportion d'erreurs faite pour les arbres précédents. 
+Nous allons à présent créer $n=160$ nouvelles données que nous allons utiliser comme données de test. Nous allons calculer la proportion d'erreur faite pour les arbres précédents. 
 
 ```{python}
 #| message: FALSE
@@ -190,7 +192,6 @@ Y_test = data_test[:, 2].astype(int)
 dmax = 15
 scores_entropy = np.zeros(dmax)
 scores_gini = np.zeros(dmax)
-plt.figure(figsize=(6, 7))
 
 for i in range(dmax):
     dt_entropy = tree.DecisionTreeClassifier(criterion='entropy',
@@ -202,20 +203,21 @@ for i in range(dmax):
     dt_gini.fit(X_train, Y_train)
     scores_gini[i] = dt_gini.score(X_test, Y_test)
 
-plt.draw()
-plt.figure()
+
+plt.figure(figsize=(7, 4))
 plt.plot(1-scores_entropy, label='entropy')
 plt.plot(1-scores_gini, label='gini')
 plt.legend(["entropy", "gini"])
 plt.xlabel('Max depth')
 plt.ylabel('Accuracy Score')
 plt.title('Error with entropy and gini criterion')
+plt.draw()
 print("Scores with entropy criterion: ", 1-scores_entropy)
 best_depth = np.argmin(1-scores_entropy)+1
 print("Best depth for entropy criterion: ", best_depth)
 ```
 
-Nous pouvons observer une descente plus rapide mais qui ne mène pas à une erreur nulle. En effet, plus la profondeur est élevée plus l'erreur diminue mais on remarque que l'on obtient une erreur minimale autour de $0.19$. Ce n'est pas très étonnant car cette fois nous avons des données tests différentes des données d'entrainement et donc même si j'augmente la profondeur, on peut obtenir une erreur qui augmente.
+Nous pouvons observer une descente plus rapide mais qui ne mène pas à une erreur nulle. En effet, plus la profondeur est élevée plus l'erreur diminue mais on remarque que l'on obtient une erreur minimale autour de $0.19$. Ce n'est pas très étonnant car cette fois nous avons des données tests différentes des données d'entrainement et donc si on augmente la profondeur, l'erreur diminue.
 Dans notre exemple, la valeure de max_depth est donnée par `best_depth`et vaut $8$ pour cette graine. 
 
 
@@ -228,6 +230,7 @@ On sépare le jeu en deux : $80%$ de données d'apprentissage / $20%$ de donnée
 
 ```{python}
 #| message: FALSE
+%%capture
 np.random.seed(12)
 # Import the digits dataset
 digits = datasets.load_digits()
@@ -251,7 +254,6 @@ dmax = 15
 scores_entropy = np.zeros(dmax)
 scores_gini = np.zeros(dmax)
 
-plt.figure(figsize=(15, 10))
 for i in range(dmax):
     dt_entropy = tree.DecisionTreeClassifier(criterion='entropy',
                                              max_depth=i+1)
@@ -261,10 +263,8 @@ for i in range(dmax):
     dt_gini = tree.DecisionTreeClassifier(criterion='gini', max_depth=i+1)
     dt_gini.fit(X_train, Y_train)
     scores_gini[i] = dt_gini.score(X_train, Y_train)
-plt.draw()
 
-
-plt.figure()
+plt.figure(figsize=(7, 4))
 plt.plot(1-scores_entropy, label='entropy')
 plt.plot(1-scores_gini, label='gini')
 plt.xlabel('Max depth')
@@ -288,7 +288,6 @@ dmax = 20
 scores_entropy = np.zeros(dmax)
 scores_gini = np.zeros(dmax)
 
-plt.figure(figsize=(6, 7))
 for i in range(dmax):
     dt_entropy = tree.DecisionTreeClassifier(criterion='entropy',
                                              max_depth=i + 1)
@@ -299,21 +298,21 @@ for i in range(dmax):
     dt_gini.fit(X_train, Y_train)
     scores_gini[i] = dt_gini.score(X_test, Y_test)
 
-plt.draw()
-plt.figure()
+plt.figure(figsize=(7, 4))
 plt.plot(1-scores_entropy, label='entropy')
 plt.plot(1-scores_gini, label='gini')
 plt.legend(["entropy", "gini"])
 plt.xlabel('Max depth')
 plt.ylabel('Accuracy Score')
 plt.title('Error with entropy and gini criterion')
+plt.draw()
 print("Error with entropy criterion: ", 1-scores_entropy)
 
 ```
 
 Pour les données tests nous obtenons une erreur qui diminue également et qui "stagne" autour de $0.15$. On arrive à peu près à cette valeur lorsque la profondeur arrive à $7$. Pour ce jeu de données, on voit donc qu'il n'y a pas besoin d'une grande profondeur pour obtenir des erreurs plus faibles. 
 
-Malheureusement, en réalité, nous n'avons pas un ensemble de test aussi important que celui que nous avons ici. 
+Malheureusement, en réalité, nous n'avons pas toujours un ensemble de test à disposition.
 
 ## Méthodes de choix de paramètres - Sélection de modèle
 <a name="Méthodes de choix de paramètres"></a>
