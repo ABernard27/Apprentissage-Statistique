@@ -34,10 +34,13 @@ On partitionne ensuite en 2 sous-ensembles pour avoir un sous-échantillon d'ent
 
 ```{python}
 #| echo: FALSE
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import rc
 import graphviz
+
+sys.path.append('./code/')
 
 from sklearn import tree, datasets
 from sklearn.tree import export_graphviz
@@ -149,7 +152,7 @@ graph.render("./arbre/arbre", format='png')
 ```
 
 
-<img src='./arbre/arbre.png' width=800>
+<img src='code/arbre/arbre.png' width=800>
 
 Un arbre de décision est assez simple à lire. Tout d'abord il se compose d'un noeud dit "racine" qui est le tout premier noeud de l'arbre puis de deux noeuds enfants. Chaque noeud non-terminal possède à son tour deux noeuds enfants. Puis nous arrivons après un certain nombre de feuilles aux noeuds terminaux avec les décisions. 
 
@@ -158,7 +161,7 @@ Si la condition au noeud $k$ est vérifiée alors on suit la branche de gauche, 
 Voici le début de l'arbre que nous avons obtenu. 
 
 
-<img src='./arbre/arbre2.png' width=600>
+<img src='code/arbre/arbre2.png' width=600>
 
 
 Explicitons chaque élément :
