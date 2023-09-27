@@ -21,6 +21,6 @@ Afin de compiler le fichier `.qmd`, il faut exécuter la commande suivante dans 
 $ quarto render TP2-arbres_de_decision.qmd
 ```
 
-### Pages github
+### Page github
 
-La page `html` associé au compte-rendu du TP est accessible directement en cliquant sur le lien à droite dans la rubrique *About*. 
+La page `html` associée au compte-rendu du TP est accessible directement en cliquant sur le lien à droite dans la rubrique *About*. 
