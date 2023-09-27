@@ -17,6 +17,8 @@ date: 2023-09-19
 # Arbre de décision - algorithme CART
 <a name="Arbre de décision - algorithme CART"></a>
 
+L'algorithme CART dont l'acronyme signifie « Classification And Regression Trees » a pour rôle de construire des arbres binaires de classification et de régression. Nous allons, dans ce TP, nous intéresser principalement aux arbres de classification.
+
 ## Classification avec les arbres
 <a name="Classification avec les arbres"></a>
 
@@ -24,7 +26,7 @@ Dans toute la suite, nous fixerons une graine pour pouvoir discuter des résulta
 
 ### Question 1 <a name="Question 1"></a>
 
-Dans le cadre de la régression, lorsque l'on cherche à prédire une valeur numérique pour $Y$, on peut utiliser la variance comme moyen de mesurer l'homogénéité. En effet, plus la variance entre les données est élevée plus les données sont hétérogènes, plus elle est faible et plus les données sont homogènes. 
+Dans le cadre de la régression, on cherche à prédire une valeur numérique pour $Y$ et non une classe. Un bon critère pour mesurer l'homogénéité et l'hétérogénéité est la variance. En effet, plus la variance entre les données est élevée plus les données sont hétérogènes, plus elle est faible et plus les données sont homogènes. Cela nous permet donc bien de voir si les valeurs sont proches ou non. 
 
 ### Question 2 <a name="Question 2"></a>
 
@@ -412,5 +414,51 @@ plt.show()
 
 La courbe d'apprentissage sur les données d'entrainement vaut $1$ puis diminue légèrement plus le nombre de données augmente. Nous avons déjà vu que si nous testons nos données d'apprentissage nous apprenons très bien dans le cas où la profondeur de l'arbre est assez élevé, et ici, nous avons pris la profondeur qui minimise l'erreur c'est donc cohérent. De plus, le score diminue lorsque le nombre de données augmente car plus il y a de données d'apprentissage plus il y a de risque de sur-apprentissage et donc l'erreur n'est pas nulle.
 
-Concernant la courbe d'apprentissage sur les données lors de la validation croisée, nous observons une augmentation du score lorsque le nombre de données d'entrainement augmente. En effet, plus on a de données d'entrainement, plus on apprend et donc le risque d'erreur diminue. À l'origine de la courbe nous sommes à $200$ données d'entrainement et le score est inférieure à $0.6$, on est dans le cadre du sous-apprentissage. Il n'y a pas assez de données pour donner des résultats réellement concluant, il y a plus d'erreur commise lors de la fabrication de `y_test`. 
+Concernant la courbe d'apprentissage sur les données lors de la validation croisée, nous observons une augmentation du score lorsque le nombre de données d'entrainement augmente. En effet, plus on a de données d'entrainement, plus on apprend et donc le risque d'erreur diminue. À l'origine de la courbe nous sommes à $200$ données d'entrainement et le score est inférieure à $0.6$, on voit donc que lorsqu'il n'y a pas assez de données nous n'apprenons pas assez. Il y a plus d'erreur commise lors de la fabrication de `y_test`. 
+
+Regardons dans le cas où la profondeur d'arbre est plus faible. Prenons 4. 
+
+```{python}
+#| echo: false
+#| fig-align: center
+np.random.seed(12)
+# modèle d'apprentissage
+
+X = digits.data
+y = digits.target
+model = tree.DecisionTreeClassifier(criterion='entropy', max_depth=4)
+
+# Générer la courbe d'apprentissage
+n_samples, train_scores, test_scores = learning_curve(model, X, y, cv=10)
+
+# Calculer les moyennes et les écarts types des scores d'entraînement
+# et de test
+train_scores_mean = np.mean(train_scores, axis=1)
+train_scores_std = np.std(train_scores, axis=1)
+test_scores_mean = np.mean(test_scores, axis=1)
+test_scores_std = np.std(test_scores, axis=1)
+
+# Tracer la courbe d'apprentissage avec intervalle de confiance
+plt.figure()
+plt.title("Learning curve")
+plt.xlabel("Training set size")
+plt.ylabel("Score")
+plt.grid()
+plt.fill_between(n_samples, train_scores_mean - train_scores_std,
+                 train_scores_mean + train_scores_std, alpha=0.1,
+                 color="red")
+plt.fill_between(n_samples, test_scores_mean - test_scores_std,
+                 test_scores_mean + test_scores_std, alpha=0.1,
+                 color="green")
+plt.plot(n_samples, train_scores_mean, 'o-', color="red",
+         label="Train score")
+plt.plot(n_samples, test_scores_mean, 'o-', color="green",
+         label="Score by cross-validation")
+plt.legend()
+plt.show()
+```
+
+Dans ce cas-là nous remarquons que le score est bien moins bon. Pour les données d'entrainement, nous sommes dans un cas de sous-apprentissage. En effet, seulement 4 coupes sont autorisés pour répartir les données, ce n'est pas suffisant et les données ne sont pas dans les bonnes classes, on obtient un score qui diminue en fonction du nombre de données. Plus on a de données, plus il est difficile de bien les classer avec peu de coupe. 
+
+Pour la courbe réalisée à partir de la validation croisée, il est clair que ce n'est pas efficace. Le maximum ne dépasse même pas 0.7 puis redescend ensuite avec le nombre de données. On est encore dans un cas de sous-apprentissage, ce n'est pas étonnant puisque si sur les données d'entrainement nous ne parvenons pas à bien apprendre, sur d'autres données ça ne peut pas être mieux. 
 

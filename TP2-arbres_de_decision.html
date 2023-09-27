@@ -139,13 +139,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="arbre-de-décision---algorithme-cart" class="level1">
 <h1>Arbre de décision - algorithme CART</h1>
 <p><a name="Arbre de décision - algorithme CART" href=""></a></p>
+<p>L’algorithme CART dont l’acronyme signifie « Classification And Regression Trees » a pour rôle de construire des arbres binaires de classification et de régression. Nous allons, dans ce TP, nous intéresser principalement aux arbres de classification.</p>
 <section id="classification-avec-les-arbres" class="level2">
 <h2 class="anchored" data-anchor-id="classification-avec-les-arbres">Classification avec les arbres</h2>
 <p><a name="Classification avec les arbres" href=""></a></p>
 <p>Dans toute la suite, nous fixerons une graine pour pouvoir discuter des résultats plus simplement car c’est aléatoire donc nous pouvons ne pas obtenir exactement les mêmes résultats à chaque simulation.</p>
 <section id="question-1" class="level3">
 <h3 class="anchored" data-anchor-id="question-1">Question 1 <a name="Question 1" href=""></a></h3>
-<p>Dans le cadre de la régression, lorsque l’on cherche à prédire une valeur numérique pour <span class="math inline">\(Y\)</span>, on peut utiliser la variance comme moyen de mesurer l’homogénéité. En effet, plus la variance entre les données est élevée plus les données sont hétérogènes, plus elle est faible et plus les données sont homogènes.</p>
+<p>Dans le cadre de la régression, on cherche à prédire une valeur numérique pour <span class="math inline">\(Y\)</span> et non une classe. Un bon critère pour mesurer l’homogénéité et l’hétérogénéité est la variance. En effet, plus la variance entre les données est élevée plus les données sont hétérogènes, plus elle est faible et plus les données sont homogènes. Cela nous permet donc bien de voir si les valeurs sont proches ou non.</p>
 </section>
 <section id="question-2" class="level3">
 <h3 class="anchored" data-anchor-id="question-2">Question 2 <a name="Question 2" href=""></a></h3>
@@ -464,7 +465,19 @@ Error with Gini criterion:  [8.00278358e-01 6.80584551e-01 5.08002784e-01 4.0083
 </div>
 </div>
 <p>La courbe d’apprentissage sur les données d’entrainement vaut <span class="math inline">\(1\)</span> puis diminue légèrement plus le nombre de données augmente. Nous avons déjà vu que si nous testons nos données d’apprentissage nous apprenons très bien dans le cas où la profondeur de l’arbre est assez élevé, et ici, nous avons pris la profondeur qui minimise l’erreur c’est donc cohérent. De plus, le score diminue lorsque le nombre de données augmente car plus il y a de données d’apprentissage plus il y a de risque de sur-apprentissage et donc l’erreur n’est pas nulle.</p>
-<p>Concernant la courbe d’apprentissage sur les données lors de la validation croisée, nous observons une augmentation du score lorsque le nombre de données d’entrainement augmente. En effet, plus on a de données d’entrainement, plus on apprend et donc le risque d’erreur diminue. À l’origine de la courbe nous sommes à <span class="math inline">\(200\)</span> données d’entrainement et le score est inférieure à <span class="math inline">\(0.6\)</span>, on est dans le cadre du sous-apprentissage. Il n’y a pas assez de données pour donner des résultats réellement concluant, il y a plus d’erreur commise lors de la fabrication de <code>y_test</code>.</p>
+<p>Concernant la courbe d’apprentissage sur les données lors de la validation croisée, nous observons une augmentation du score lorsque le nombre de données d’entrainement augmente. En effet, plus on a de données d’entrainement, plus on apprend et donc le risque d’erreur diminue. À l’origine de la courbe nous sommes à <span class="math inline">\(200\)</span> données d’entrainement et le score est inférieure à <span class="math inline">\(0.6\)</span>, on voit donc que lorsqu’il n’y a pas assez de données nous n’apprenons pas assez. Il y a plus d’erreur commise lors de la fabrication de <code>y_test</code>.</p>
+<p>Regardons dans le cas où la profondeur d’arbre est plus faible. Prenons 4.</p>
+<div class="cell" data-execution_count="13">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="TP2-arbres_de_decision_files/figure-html/cell-14-output-1.png" width="589" height="449" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Dans ce cas-là nous remarquons que le score est bien moins bon. Pour les données d’entrainement, nous sommes dans un cas de sous-apprentissage. En effet, seulement 4 coupes sont autorisés pour répartir les données, ce n’est pas suffisant et les données ne sont pas dans les bonnes classes, on obtient un score qui diminue en fonction du nombre de données. Plus on a de données, plus il est difficile de bien les classer avec peu de coupe.</p>
+<p>Pour la courbe réalisée à partir de la validation croisée, il est clair que ce n’est pas efficace. Le maximum ne dépasse même pas 0.7 puis redescend ensuite avec le nombre de données. On est encore dans un cas de sous-apprentissage, ce n’est pas étonnant puisque si sur les données d’entrainement nous ne parvenons pas à bien apprendre, sur d’autres données ça ne peut pas être mieux.</p>
 <!-- -->
 
 </section>
@@ -776,402 +789,450 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="fu"># Arbre de décision - algorithme CART</span></span>
 <span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;a</span> <span class="er">name</span><span class="ot">=</span><span class="st">"Arbre de décision - algorithme CART"</span><span class="kw">&gt;&lt;/a&gt;</span></span>
 <span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="fu">## Classification avec les arbres</span></span>
-<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;a</span> <span class="er">name</span><span class="ot">=</span><span class="st">"Classification avec les arbres"</span><span class="kw">&gt;&lt;/a&gt;</span></span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>Dans toute la suite, nous fixerons une graine pour pouvoir discuter des résultats plus simplement car c'est aléatoire donc nous pouvons ne pas obtenir exactement les mêmes résultats à chaque simulation.</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>L'algorithme CART dont l'acronyme signifie « Classification And Regression Trees » a pour rôle de construire des arbres binaires de classification et de régression. Nous allons, dans ce TP, nous intéresser principalement aux arbres de classification.</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="fu">## Classification avec les arbres</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;a</span> <span class="er">name</span><span class="ot">=</span><span class="st">"Classification avec les arbres"</span><span class="kw">&gt;&lt;/a&gt;</span></span>
 <span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="fu">### Question 1 &lt;a name="Question 1"&gt;&lt;/a&gt;</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>Dans toute la suite, nous fixerons une graine pour pouvoir discuter des résultats plus simplement car c'est aléatoire donc nous pouvons ne pas obtenir exactement les mêmes résultats à chaque simulation.</span>
 <span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>Dans le cadre de la régression, lorsque l'on cherche à prédire une valeur numérique pour $Y$, on peut utiliser la variance comme moyen de mesurer l'homogénéité. En effet, plus la variance entre les données est élevée plus les données sont hétérogènes, plus elle est faible et plus les données sont homogènes. </span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a><span class="fu">### Question 1 &lt;a name="Question 1"&gt;&lt;/a&gt;</span></span>
 <span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a><span class="fu">### Question 2 &lt;a name="Question 2"&gt;&lt;/a&gt;</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>Dans le cadre de la régression, on cherche à prédire une valeur numérique pour $Y$ et non une classe. Un bon critère pour mesurer l'homogénéité et l'hétérogénéité est la variance. En effet, plus la variance entre les données est élevée plus les données sont hétérogènes, plus elle est faible et plus les données sont homogènes. Cela nous permet donc bien de voir si les valeurs sont proches ou non. </span>
 <span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>Dans un premier temps, créons deux arbres de décision avec les critères de classification suivants : l'indice de gini et l'entropie. Nous simulons ensuite avec <span class="in">`rand_checkers`</span> un échantillon de taille $n=456$. </span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a><span class="fu">### Question 2 &lt;a name="Question 2"&gt;&lt;/a&gt;</span></span>
 <span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>On partitionne ensuite en 2 sous-ensembles pour avoir un ensemble d'entrainement et un ensemble de test. </span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>Dans un premier temps, créons deux arbres de décision avec les critères de classification suivants : l'indice de gini et l'entropie. Nous simulons ensuite avec <span class="in">`rand_checkers`</span> un échantillon de taille $n=456$. </span>
 <span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: FALSE</span></span>
-<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
-<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> rc</span>
-<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> graphviz</span>
-<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a>sys.path.append(<span class="st">'./code/'</span>)</span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>On partitionne ensuite en 2 sous-ensembles pour avoir un ensemble d'entrainement et un ensemble de test. </span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: FALSE</span></span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> rc</span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> graphviz</span>
 <span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn <span class="im">import</span> tree, datasets</span>
-<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.tree <span class="im">import</span> export_graphviz</span>
-<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> cross_val_score, train_test_split</span>
-<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> learning_curve</span>
-<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tp_arbres_source <span class="im">import</span> (rand_gauss, rand_bi_gauss, rand_tri_gauss,</span>
-<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a>                              rand_checkers, rand_clown,</span>
-<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a>                              plot_2d, frontiere)</span>
-<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-58"><a href="#cb14-58" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb14-59"><a href="#cb14-59" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: FALSE</span></span>
-<span id="cb14-60"><a href="#cb14-60" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">145</span>)</span>
-<span id="cb14-61"><a href="#cb14-61" aria-hidden="true" tabindex="-1"></a>dt_entropy <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'entropy'</span>)</span>
-<span id="cb14-62"><a href="#cb14-62" aria-hidden="true" tabindex="-1"></a>dt_gini <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'gini'</span>)</span>
-<span id="cb14-63"><a href="#cb14-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-64"><a href="#cb14-64" aria-hidden="true" tabindex="-1"></a><span class="co"># n = 456 = 114*4</span></span>
-<span id="cb14-65"><a href="#cb14-65" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> rand_checkers(n1<span class="op">=</span><span class="dv">114</span>, n2<span class="op">=</span><span class="dv">114</span>, n3<span class="op">=</span><span class="dv">114</span>, n4<span class="op">=</span><span class="dv">114</span>, sigma<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb14-66"><a href="#cb14-66" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> data[:, :<span class="dv">2</span>]</span>
-<span id="cb14-67"><a href="#cb14-67" aria-hidden="true" tabindex="-1"></a>Y_train <span class="op">=</span> data[:, <span class="dv">2</span>].astype(<span class="bu">int</span>)</span>
-<span id="cb14-68"><a href="#cb14-68" aria-hidden="true" tabindex="-1"></a>dt_gini.fit(X_train, Y_train)</span>
-<span id="cb14-69"><a href="#cb14-69" aria-hidden="true" tabindex="-1"></a>dt_entropy.fit(X_train, Y_train)</span>
-<span id="cb14-70"><a href="#cb14-70" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"error with gini criterion :"</span>, <span class="dv">1</span><span class="op">-</span>dt_gini.score(X_train, Y_train))</span>
-<span id="cb14-71"><a href="#cb14-71" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"error with entropy criterion :"</span>, <span class="dv">1</span><span class="op">-</span>dt_entropy.score(X_train, Y_train))</span>
-<span id="cb14-72"><a href="#cb14-72" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-73"><a href="#cb14-73" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-74"><a href="#cb14-74" aria-hidden="true" tabindex="-1"></a>Nous avons regardé les erreurs pour l'indice de gini et l'entropie sur les données d'entrainements et nous obtenons 0 pour les deux. En effet, nous avons le même échantillon pour les variables à prédire que pour les observations, donc nous apprenons très bien sur cet échantillon. Nous pourrions regarder pour quelle profondeur nous obtenons $0$. Probablement que l'algorithme s'arrête lorsque l'on atteint cette valeur ($1$ en l'occurence car il raisonne en terme de score).</span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a>sys.path.append(<span class="st">'./code/'</span>)</span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn <span class="im">import</span> tree, datasets</span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.tree <span class="im">import</span> export_graphviz</span>
+<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> cross_val_score, train_test_split</span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> learning_curve</span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tp_arbres_source <span class="im">import</span> (rand_gauss, rand_bi_gauss, rand_tri_gauss,</span>
+<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a>                              rand_checkers, rand_clown,</span>
+<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a>                              plot_2d, frontiere)</span>
+<span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-60"><a href="#cb14-60" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb14-61"><a href="#cb14-61" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: FALSE</span></span>
+<span id="cb14-62"><a href="#cb14-62" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">145</span>)</span>
+<span id="cb14-63"><a href="#cb14-63" aria-hidden="true" tabindex="-1"></a>dt_entropy <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'entropy'</span>)</span>
+<span id="cb14-64"><a href="#cb14-64" aria-hidden="true" tabindex="-1"></a>dt_gini <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'gini'</span>)</span>
+<span id="cb14-65"><a href="#cb14-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-66"><a href="#cb14-66" aria-hidden="true" tabindex="-1"></a><span class="co"># n = 456 = 114*4</span></span>
+<span id="cb14-67"><a href="#cb14-67" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> rand_checkers(n1<span class="op">=</span><span class="dv">114</span>, n2<span class="op">=</span><span class="dv">114</span>, n3<span class="op">=</span><span class="dv">114</span>, n4<span class="op">=</span><span class="dv">114</span>, sigma<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb14-68"><a href="#cb14-68" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> data[:, :<span class="dv">2</span>]</span>
+<span id="cb14-69"><a href="#cb14-69" aria-hidden="true" tabindex="-1"></a>Y_train <span class="op">=</span> data[:, <span class="dv">2</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb14-70"><a href="#cb14-70" aria-hidden="true" tabindex="-1"></a>dt_gini.fit(X_train, Y_train)</span>
+<span id="cb14-71"><a href="#cb14-71" aria-hidden="true" tabindex="-1"></a>dt_entropy.fit(X_train, Y_train)</span>
+<span id="cb14-72"><a href="#cb14-72" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"error with gini criterion :"</span>, <span class="dv">1</span><span class="op">-</span>dt_gini.score(X_train, Y_train))</span>
+<span id="cb14-73"><a href="#cb14-73" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"error with entropy criterion :"</span>, <span class="dv">1</span><span class="op">-</span>dt_entropy.score(X_train, Y_train))</span>
+<span id="cb14-74"><a href="#cb14-74" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb14-75"><a href="#cb14-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-78"><a href="#cb14-78" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb14-79"><a href="#cb14-79" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: FALSE</span></span>
-<span id="cb14-80"><a href="#cb14-80" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-align: center</span></span>
-<span id="cb14-81"><a href="#cb14-81" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">145</span>)</span>
-<span id="cb14-82"><a href="#cb14-82" aria-hidden="true" tabindex="-1"></a>dmax <span class="op">=</span> <span class="dv">12</span></span>
-<span id="cb14-83"><a href="#cb14-83" aria-hidden="true" tabindex="-1"></a>scores_entropy <span class="op">=</span> np.zeros(dmax)</span>
-<span id="cb14-84"><a href="#cb14-84" aria-hidden="true" tabindex="-1"></a>scores_gini <span class="op">=</span> np.zeros(dmax)</span>
-<span id="cb14-85"><a href="#cb14-85" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-86"><a href="#cb14-86" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">10</span>))</span>
-<span id="cb14-87"><a href="#cb14-87" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(dmax):</span>
-<span id="cb14-88"><a href="#cb14-88" aria-hidden="true" tabindex="-1"></a>    dt_entropy <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'entropy'</span>,</span>
-<span id="cb14-89"><a href="#cb14-89" aria-hidden="true" tabindex="-1"></a>                                             max_depth<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span>)</span>
-<span id="cb14-90"><a href="#cb14-90" aria-hidden="true" tabindex="-1"></a>    dt_entropy.fit(X_train, Y_train)</span>
-<span id="cb14-91"><a href="#cb14-91" aria-hidden="true" tabindex="-1"></a>    scores_entropy[i] <span class="op">=</span> dt_entropy.score(X_train, Y_train)</span>
-<span id="cb14-92"><a href="#cb14-92" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-93"><a href="#cb14-93" aria-hidden="true" tabindex="-1"></a>    dt_gini <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'gini'</span>, max_depth<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span>)</span>
-<span id="cb14-94"><a href="#cb14-94" aria-hidden="true" tabindex="-1"></a>    dt_gini.fit(X_train, Y_train)</span>
-<span id="cb14-95"><a href="#cb14-95" aria-hidden="true" tabindex="-1"></a>    scores_gini[i] <span class="op">=</span> dt_gini.score(X_train, Y_train)</span>
-<span id="cb14-96"><a href="#cb14-96" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-97"><a href="#cb14-97" aria-hidden="true" tabindex="-1"></a>    plt.subplot(<span class="dv">3</span>, <span class="dv">4</span>, i <span class="op">+</span> <span class="dv">1</span>)</span>
-<span id="cb14-98"><a href="#cb14-98" aria-hidden="true" tabindex="-1"></a>    frontiere(<span class="kw">lambda</span> x: dt_gini.predict(x.reshape((<span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>))), X_train, Y_train,</span>
-<span id="cb14-99"><a href="#cb14-99" aria-hidden="true" tabindex="-1"></a>              step<span class="op">=</span><span class="dv">50</span>, samples<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb14-100"><a href="#cb14-100" aria-hidden="true" tabindex="-1"></a>plt.draw()</span>
-<span id="cb14-101"><a href="#cb14-101" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-102"><a href="#cb14-102" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-103"><a href="#cb14-103" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
-<span id="cb14-104"><a href="#cb14-104" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="dv">1</span><span class="op">-</span>scores_entropy, label<span class="op">=</span><span class="st">'entropy'</span>)</span>
-<span id="cb14-105"><a href="#cb14-105" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="dv">1</span><span class="op">-</span>scores_gini, label<span class="op">=</span><span class="st">'gini'</span>)</span>
-<span id="cb14-106"><a href="#cb14-106" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Max depth'</span>)</span>
-<span id="cb14-107"><a href="#cb14-107" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Error'</span>)</span>
-<span id="cb14-108"><a href="#cb14-108" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Error with entropy and gini criterion'</span>)</span>
-<span id="cb14-109"><a href="#cb14-109" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb14-110"><a href="#cb14-110" aria-hidden="true" tabindex="-1"></a>plt.draw()</span>
-<span id="cb14-111"><a href="#cb14-111" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Error with entropy criterion: "</span>, <span class="dv">1</span><span class="op">-</span>scores_entropy)</span>
-<span id="cb14-112"><a href="#cb14-112" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Error with Gini criterion: "</span>, <span class="dv">1</span><span class="op">-</span>scores_gini)</span>
-<span id="cb14-113"><a href="#cb14-113" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-114"><a href="#cb14-114" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-76"><a href="#cb14-76" aria-hidden="true" tabindex="-1"></a>Nous avons regardé les erreurs pour l'indice de gini et l'entropie sur les données d'entrainements et nous obtenons 0 pour les deux. En effet, nous avons le même échantillon pour les variables à prédire que pour les observations, donc nous apprenons très bien sur cet échantillon. Nous pourrions regarder pour quelle profondeur nous obtenons $0$. Probablement que l'algorithme s'arrête lorsque l'on atteint cette valeur ($1$ en l'occurence car il raisonne en terme de score).</span>
+<span id="cb14-77"><a href="#cb14-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-80"><a href="#cb14-80" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb14-81"><a href="#cb14-81" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: FALSE</span></span>
+<span id="cb14-82"><a href="#cb14-82" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-align: center</span></span>
+<span id="cb14-83"><a href="#cb14-83" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">145</span>)</span>
+<span id="cb14-84"><a href="#cb14-84" aria-hidden="true" tabindex="-1"></a>dmax <span class="op">=</span> <span class="dv">12</span></span>
+<span id="cb14-85"><a href="#cb14-85" aria-hidden="true" tabindex="-1"></a>scores_entropy <span class="op">=</span> np.zeros(dmax)</span>
+<span id="cb14-86"><a href="#cb14-86" aria-hidden="true" tabindex="-1"></a>scores_gini <span class="op">=</span> np.zeros(dmax)</span>
+<span id="cb14-87"><a href="#cb14-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-88"><a href="#cb14-88" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">10</span>))</span>
+<span id="cb14-89"><a href="#cb14-89" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(dmax):</span>
+<span id="cb14-90"><a href="#cb14-90" aria-hidden="true" tabindex="-1"></a>    dt_entropy <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'entropy'</span>,</span>
+<span id="cb14-91"><a href="#cb14-91" aria-hidden="true" tabindex="-1"></a>                                             max_depth<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb14-92"><a href="#cb14-92" aria-hidden="true" tabindex="-1"></a>    dt_entropy.fit(X_train, Y_train)</span>
+<span id="cb14-93"><a href="#cb14-93" aria-hidden="true" tabindex="-1"></a>    scores_entropy[i] <span class="op">=</span> dt_entropy.score(X_train, Y_train)</span>
+<span id="cb14-94"><a href="#cb14-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-95"><a href="#cb14-95" aria-hidden="true" tabindex="-1"></a>    dt_gini <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'gini'</span>, max_depth<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb14-96"><a href="#cb14-96" aria-hidden="true" tabindex="-1"></a>    dt_gini.fit(X_train, Y_train)</span>
+<span id="cb14-97"><a href="#cb14-97" aria-hidden="true" tabindex="-1"></a>    scores_gini[i] <span class="op">=</span> dt_gini.score(X_train, Y_train)</span>
+<span id="cb14-98"><a href="#cb14-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-99"><a href="#cb14-99" aria-hidden="true" tabindex="-1"></a>    plt.subplot(<span class="dv">3</span>, <span class="dv">4</span>, i <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb14-100"><a href="#cb14-100" aria-hidden="true" tabindex="-1"></a>    frontiere(<span class="kw">lambda</span> x: dt_gini.predict(x.reshape((<span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>))), X_train, Y_train,</span>
+<span id="cb14-101"><a href="#cb14-101" aria-hidden="true" tabindex="-1"></a>              step<span class="op">=</span><span class="dv">50</span>, samples<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb14-102"><a href="#cb14-102" aria-hidden="true" tabindex="-1"></a>plt.draw()</span>
+<span id="cb14-103"><a href="#cb14-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-104"><a href="#cb14-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-105"><a href="#cb14-105" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
+<span id="cb14-106"><a href="#cb14-106" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="dv">1</span><span class="op">-</span>scores_entropy, label<span class="op">=</span><span class="st">'entropy'</span>)</span>
+<span id="cb14-107"><a href="#cb14-107" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="dv">1</span><span class="op">-</span>scores_gini, label<span class="op">=</span><span class="st">'gini'</span>)</span>
+<span id="cb14-108"><a href="#cb14-108" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Max depth'</span>)</span>
+<span id="cb14-109"><a href="#cb14-109" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Error'</span>)</span>
+<span id="cb14-110"><a href="#cb14-110" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Error with entropy and gini criterion'</span>)</span>
+<span id="cb14-111"><a href="#cb14-111" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb14-112"><a href="#cb14-112" aria-hidden="true" tabindex="-1"></a>plt.draw()</span>
+<span id="cb14-113"><a href="#cb14-113" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Error with entropy criterion: "</span>, <span class="dv">1</span><span class="op">-</span>scores_entropy)</span>
+<span id="cb14-114"><a href="#cb14-114" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Error with Gini criterion: "</span>, <span class="dv">1</span><span class="op">-</span>scores_gini)</span>
 <span id="cb14-115"><a href="#cb14-115" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-116"><a href="#cb14-116" aria-hidden="true" tabindex="-1"></a>Lorsque l'on regarde l'erreur pour différentes profondeurs de l'arbre, on se rend compte que plus il est profond plus l'on se rapproche de $0$. Ici nous avons pris max_depth=$12$. En effet au-delà de cette valeur l'erreur est nulle ou presque. Nous pouvons le visualiser sur les courbes.</span>
+<span id="cb14-116"><a href="#cb14-116" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb14-117"><a href="#cb14-117" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-118"><a href="#cb14-118" aria-hidden="true" tabindex="-1"></a>On peut noter également que si l'on prend un arbre avec une petite profondeur, l'erreur est très élevée car si les données sont bien réparties et que l'on ne peut faire qu'une coupe par exemple, nous aurons deux classes très hétérogènes.</span>
+<span id="cb14-118"><a href="#cb14-118" aria-hidden="true" tabindex="-1"></a>Lorsque l'on regarde l'erreur pour différentes profondeurs de l'arbre, on se rend compte que plus il est profond plus l'on se rapproche de $0$. Ici nous avons pris max_depth=$12$. En effet au-delà de cette valeur l'erreur est nulle ou presque. Nous pouvons le visualiser sur les courbes.</span>
 <span id="cb14-119"><a href="#cb14-119" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-120"><a href="#cb14-120" aria-hidden="true" tabindex="-1"></a>Nous avons également afficher les frontières et nous pouvons observer une belle classification des données lorsque la profondeur est élevée. </span>
+<span id="cb14-120"><a href="#cb14-120" aria-hidden="true" tabindex="-1"></a>On peut noter également que si l'on prend un arbre avec une petite profondeur, l'erreur est très élevée car si les données sont bien réparties et que l'on ne peut faire qu'une coupe par exemple, nous aurons deux classes très hétérogènes.</span>
 <span id="cb14-121"><a href="#cb14-121" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-122"><a href="#cb14-122" aria-hidden="true" tabindex="-1"></a><span class="fu">### Question 3 &lt;a name="Question 3"&gt;&lt;/a&gt;</span></span>
+<span id="cb14-122"><a href="#cb14-122" aria-hidden="true" tabindex="-1"></a>Nous avons également afficher les frontières et nous pouvons observer une belle classification des données lorsque la profondeur est élevée. </span>
 <span id="cb14-123"><a href="#cb14-123" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-124"><a href="#cb14-124" aria-hidden="true" tabindex="-1"></a>Affichons la classification que l'on obtient avec la profondeur qui minimise le pourcentage d'erreurs obtenues avec l'entropie. Nous avons vu que pour depth=$12$ l'erreur est nulle (le score vaut $1$, score=1-erreur).</span>
+<span id="cb14-124"><a href="#cb14-124" aria-hidden="true" tabindex="-1"></a><span class="fu">### Question 3 &lt;a name="Question 3"&gt;&lt;/a&gt;</span></span>
 <span id="cb14-125"><a href="#cb14-125" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-128"><a href="#cb14-128" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb14-129"><a href="#cb14-129" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: FALSE</span></span>
-<span id="cb14-130"><a href="#cb14-130" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-align: center</span></span>
-<span id="cb14-131"><a href="#cb14-131" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">145</span>)</span>
-<span id="cb14-132"><a href="#cb14-132" aria-hidden="true" tabindex="-1"></a>dt_entropy.max_depth <span class="op">=</span> <span class="dv">12</span></span>
-<span id="cb14-133"><a href="#cb14-133" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-134"><a href="#cb14-134" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
-<span id="cb14-135"><a href="#cb14-135" aria-hidden="true" tabindex="-1"></a>frontiere(<span class="kw">lambda</span> x: dt_entropy.predict(x.reshape((<span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>))), X_train, Y_train,</span>
-<span id="cb14-136"><a href="#cb14-136" aria-hidden="true" tabindex="-1"></a>          step<span class="op">=</span><span class="dv">100</span>)</span>
-<span id="cb14-137"><a href="#cb14-137" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-138"><a href="#cb14-138" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Best frontier with entropy criterion"</span>)</span>
-<span id="cb14-139"><a href="#cb14-139" aria-hidden="true" tabindex="-1"></a>plt.draw()</span>
-<span id="cb14-140"><a href="#cb14-140" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Best scores with entropy criterion: "</span>, dt_entropy.score(X_train,</span>
-<span id="cb14-141"><a href="#cb14-141" aria-hidden="true" tabindex="-1"></a>                                                               Y_train))</span>
-<span id="cb14-142"><a href="#cb14-142" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-143"><a href="#cb14-143" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-144"><a href="#cb14-144" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-145"><a href="#cb14-145" aria-hidden="true" tabindex="-1"></a><span class="fu">### Question 4 &lt;a name="Question 4"&gt;&lt;/a&gt;</span></span>
+<span id="cb14-126"><a href="#cb14-126" aria-hidden="true" tabindex="-1"></a>Affichons la classification que l'on obtient avec la profondeur qui minimise le pourcentage d'erreurs obtenues avec l'entropie. Nous avons vu que pour depth=$12$ l'erreur est nulle (le score vaut $1$, score=1-erreur).</span>
+<span id="cb14-127"><a href="#cb14-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-130"><a href="#cb14-130" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb14-131"><a href="#cb14-131" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: FALSE</span></span>
+<span id="cb14-132"><a href="#cb14-132" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-align: center</span></span>
+<span id="cb14-133"><a href="#cb14-133" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">145</span>)</span>
+<span id="cb14-134"><a href="#cb14-134" aria-hidden="true" tabindex="-1"></a>dt_entropy.max_depth <span class="op">=</span> <span class="dv">12</span></span>
+<span id="cb14-135"><a href="#cb14-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-136"><a href="#cb14-136" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
+<span id="cb14-137"><a href="#cb14-137" aria-hidden="true" tabindex="-1"></a>frontiere(<span class="kw">lambda</span> x: dt_entropy.predict(x.reshape((<span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>))), X_train, Y_train,</span>
+<span id="cb14-138"><a href="#cb14-138" aria-hidden="true" tabindex="-1"></a>          step<span class="op">=</span><span class="dv">100</span>)</span>
+<span id="cb14-139"><a href="#cb14-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-140"><a href="#cb14-140" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Best frontier with entropy criterion"</span>)</span>
+<span id="cb14-141"><a href="#cb14-141" aria-hidden="true" tabindex="-1"></a>plt.draw()</span>
+<span id="cb14-142"><a href="#cb14-142" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Best scores with entropy criterion: "</span>, dt_entropy.score(X_train,</span>
+<span id="cb14-143"><a href="#cb14-143" aria-hidden="true" tabindex="-1"></a>                                                               Y_train))</span>
+<span id="cb14-144"><a href="#cb14-144" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-145"><a href="#cb14-145" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-146"><a href="#cb14-146" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-147"><a href="#cb14-147" aria-hidden="true" tabindex="-1"></a>Grâce aux lignes suivantes, nous pouvons réaliser l'arbre de décision pour le critère d'entropie. Affichons l'arbre en question :</span>
+<span id="cb14-147"><a href="#cb14-147" aria-hidden="true" tabindex="-1"></a><span class="fu">### Question 4 &lt;a name="Question 4"&gt;&lt;/a&gt;</span></span>
 <span id="cb14-148"><a href="#cb14-148" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-151"><a href="#cb14-151" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb14-152"><a href="#cb14-152" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: FALSE</span></span>
-<span id="cb14-153"><a href="#cb14-153" aria-hidden="true" tabindex="-1"></a>tree.plot_tree(dt_entropy)</span>
-<span id="cb14-154"><a href="#cb14-154" aria-hidden="true" tabindex="-1"></a>dot_data <span class="op">=</span> tree.export_graphviz(dt_entropy, out_file<span class="op">=</span><span class="va">None</span>)</span>
-<span id="cb14-155"><a href="#cb14-155" aria-hidden="true" tabindex="-1"></a>graph <span class="op">=</span> graphviz.Source(dot_data)</span>
-<span id="cb14-156"><a href="#cb14-156" aria-hidden="true" tabindex="-1"></a>graph.render(<span class="st">"./arbre/arbre"</span>, <span class="bu">format</span><span class="op">=</span><span class="st">'pdf'</span>)</span>
-<span id="cb14-157"><a href="#cb14-157" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-158"><a href="#cb14-158" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-161"><a href="#cb14-161" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb14-162"><a href="#cb14-162" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: FALSE</span></span>
-<span id="cb14-163"><a href="#cb14-163" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: FALSE</span></span>
-<span id="cb14-164"><a href="#cb14-164" aria-hidden="true" tabindex="-1"></a>dot_data <span class="op">=</span> tree.export_graphviz(dt_entropy, out_file<span class="op">=</span><span class="va">None</span>)</span>
-<span id="cb14-165"><a href="#cb14-165" aria-hidden="true" tabindex="-1"></a>graph <span class="op">=</span> graphviz.Source(dot_data)</span>
-<span id="cb14-166"><a href="#cb14-166" aria-hidden="true" tabindex="-1"></a>graph.render(<span class="st">"./arbre/arbre"</span>, <span class="bu">format</span><span class="op">=</span><span class="st">'png'</span>)</span>
-<span id="cb14-167"><a href="#cb14-167" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-168"><a href="#cb14-168" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-169"><a href="#cb14-169" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-170"><a href="#cb14-170" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;img</span> <span class="er">src</span><span class="ot">=</span><span class="st">'code/arbre/arbre.png'</span> <span class="er">width</span><span class="ot">=</span><span class="st">800</span><span class="kw">&gt;</span></span>
+<span id="cb14-149"><a href="#cb14-149" aria-hidden="true" tabindex="-1"></a>Grâce aux lignes suivantes, nous pouvons réaliser l'arbre de décision pour le critère d'entropie. Affichons l'arbre en question :</span>
+<span id="cb14-150"><a href="#cb14-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-153"><a href="#cb14-153" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb14-154"><a href="#cb14-154" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: FALSE</span></span>
+<span id="cb14-155"><a href="#cb14-155" aria-hidden="true" tabindex="-1"></a>tree.plot_tree(dt_entropy)</span>
+<span id="cb14-156"><a href="#cb14-156" aria-hidden="true" tabindex="-1"></a>dot_data <span class="op">=</span> tree.export_graphviz(dt_entropy, out_file<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb14-157"><a href="#cb14-157" aria-hidden="true" tabindex="-1"></a>graph <span class="op">=</span> graphviz.Source(dot_data)</span>
+<span id="cb14-158"><a href="#cb14-158" aria-hidden="true" tabindex="-1"></a>graph.render(<span class="st">"./arbre/arbre"</span>, <span class="bu">format</span><span class="op">=</span><span class="st">'pdf'</span>)</span>
+<span id="cb14-159"><a href="#cb14-159" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-160"><a href="#cb14-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-163"><a href="#cb14-163" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb14-164"><a href="#cb14-164" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: FALSE</span></span>
+<span id="cb14-165"><a href="#cb14-165" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: FALSE</span></span>
+<span id="cb14-166"><a href="#cb14-166" aria-hidden="true" tabindex="-1"></a>dot_data <span class="op">=</span> tree.export_graphviz(dt_entropy, out_file<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb14-167"><a href="#cb14-167" aria-hidden="true" tabindex="-1"></a>graph <span class="op">=</span> graphviz.Source(dot_data)</span>
+<span id="cb14-168"><a href="#cb14-168" aria-hidden="true" tabindex="-1"></a>graph.render(<span class="st">"./arbre/arbre"</span>, <span class="bu">format</span><span class="op">=</span><span class="st">'png'</span>)</span>
+<span id="cb14-169"><a href="#cb14-169" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-170"><a href="#cb14-170" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-171"><a href="#cb14-171" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-172"><a href="#cb14-172" aria-hidden="true" tabindex="-1"></a>Un arbre de décision est assez simple à lire. Tout d'abord il se compose d'un noeud dit "racine" qui est le tout premier noeud de l'arbre puis de deux noeuds enfants. Chaque noeud non-terminal possède à son tour deux noeuds enfants. Puis nous arrivons, après un certain nombre de feuilles, aux noeuds terminaux avec les décisions. </span>
+<span id="cb14-172"><a href="#cb14-172" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;img</span> <span class="er">src</span><span class="ot">=</span><span class="st">'code/arbre/arbre.png'</span> <span class="er">width</span><span class="ot">=</span><span class="st">800</span><span class="kw">&gt;</span></span>
 <span id="cb14-173"><a href="#cb14-173" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-174"><a href="#cb14-174" aria-hidden="true" tabindex="-1"></a>Si la condition au noeud $k$ est vérifiée alors on suit la branche de gauche, sinon on suit celle de droite. </span>
+<span id="cb14-174"><a href="#cb14-174" aria-hidden="true" tabindex="-1"></a>Un arbre de décision est assez simple à lire. Tout d'abord il se compose d'un noeud dit "racine" qui est le tout premier noeud de l'arbre puis de deux noeuds enfants. Chaque noeud non-terminal possède à son tour deux noeuds enfants. Puis nous arrivons, après un certain nombre de feuilles, aux noeuds terminaux avec les décisions. </span>
 <span id="cb14-175"><a href="#cb14-175" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-176"><a href="#cb14-176" aria-hidden="true" tabindex="-1"></a>Voici le début de l'arbre que nous avons obtenu. </span>
+<span id="cb14-176"><a href="#cb14-176" aria-hidden="true" tabindex="-1"></a>Si la condition au noeud $k$ est vérifiée alors on suit la branche de gauche, sinon on suit celle de droite. </span>
 <span id="cb14-177"><a href="#cb14-177" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-178"><a href="#cb14-178" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-179"><a href="#cb14-179" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;center&gt;&lt;img</span> <span class="er">src</span><span class="ot">=</span><span class="st">'code/arbre/arbre2.png'</span> <span class="er">width</span><span class="ot">=</span><span class="st">600</span><span class="kw">&gt;&lt;/center&gt;</span></span>
+<span id="cb14-178"><a href="#cb14-178" aria-hidden="true" tabindex="-1"></a>Voici le début de l'arbre que nous avons obtenu. </span>
+<span id="cb14-179"><a href="#cb14-179" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-180"><a href="#cb14-180" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-181"><a href="#cb14-181" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-182"><a href="#cb14-182" aria-hidden="true" tabindex="-1"></a>Explicitons chaque élément :</span>
+<span id="cb14-181"><a href="#cb14-181" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;center&gt;&lt;img</span> <span class="er">src</span><span class="ot">=</span><span class="st">'code/arbre/arbre2.png'</span> <span class="er">width</span><span class="ot">=</span><span class="st">600</span><span class="kw">&gt;&lt;/center&gt;</span></span>
+<span id="cb14-182"><a href="#cb14-182" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-183"><a href="#cb14-183" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-184"><a href="#cb14-184" aria-hidden="true" tabindex="-1"></a>$\bullet$ $x<span class="co">[</span><span class="ot">0</span><span class="co">]</span>&lt;1.549$ : c'est la condition, si l'abscisse est inférieure à $1.549$ on va à gauche, sinon à droite</span>
+<span id="cb14-184"><a href="#cb14-184" aria-hidden="true" tabindex="-1"></a>Explicitons chaque élément :</span>
 <span id="cb14-185"><a href="#cb14-185" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-186"><a href="#cb14-186" aria-hidden="true" tabindex="-1"></a>$\bullet$ entropy=$2$ : l'entropie sur les données dans la classe (ici toutes les données) vaut $2$</span>
+<span id="cb14-186"><a href="#cb14-186" aria-hidden="true" tabindex="-1"></a>$\bullet$ $x<span class="co">[</span><span class="ot">0</span><span class="co">]</span>&lt;1.549$ : c'est la condition, si l'abscisse est inférieure à $1.549$ on va à gauche, sinon à droite</span>
 <span id="cb14-187"><a href="#cb14-187" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-188"><a href="#cb14-188" aria-hidden="true" tabindex="-1"></a>$\bullet$ samples=$448$ : il y a pour commencer $448$ données</span>
+<span id="cb14-188"><a href="#cb14-188" aria-hidden="true" tabindex="-1"></a>$\bullet$ entropy=$2$ : l'entropie sur les données dans la classe (ici toutes les données) vaut $2$</span>
 <span id="cb14-189"><a href="#cb14-189" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-190"><a href="#cb14-190" aria-hidden="true" tabindex="-1"></a>$\bullet$ value=$<span class="co">[</span><span class="ot">112,112,112,112</span><span class="co">]</span>$ : il y a $112$ valeurs dans chaque classe</span>
+<span id="cb14-190"><a href="#cb14-190" aria-hidden="true" tabindex="-1"></a>$\bullet$ samples=$448$ : il y a pour commencer $448$ données</span>
 <span id="cb14-191"><a href="#cb14-191" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-192"><a href="#cb14-192" aria-hidden="true" tabindex="-1"></a>Si la condition est vérifiée je vais donc à gauche et cette fois j'ai plus que $407$ données, une entropie de $1.999$ sur ces données puis $98$ données dans la classe $1$, $104$ dans la classe $2$, $107$ dans la classe $3$ et $98$ dans la dernière. </span>
+<span id="cb14-192"><a href="#cb14-192" aria-hidden="true" tabindex="-1"></a>$\bullet$ value=$<span class="co">[</span><span class="ot">112,112,112,112</span><span class="co">]</span>$ : il y a $112$ valeurs dans chaque classe</span>
 <span id="cb14-193"><a href="#cb14-193" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-194"><a href="#cb14-194" aria-hidden="true" tabindex="-1"></a><span class="fu">### Question 5 &lt;a name="Question 5"&gt;&lt;/a&gt;</span></span>
+<span id="cb14-194"><a href="#cb14-194" aria-hidden="true" tabindex="-1"></a>Si la condition est vérifiée je vais donc à gauche et cette fois j'ai plus que $407$ données, une entropie de $1.999$ sur ces données puis $98$ données dans la classe $1$, $104$ dans la classe $2$, $107$ dans la classe $3$ et $98$ dans la dernière. </span>
 <span id="cb14-195"><a href="#cb14-195" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-196"><a href="#cb14-196" aria-hidden="true" tabindex="-1"></a>Nous allons à présent créer $n=160$ nouvelles données que nous allons utiliser comme données de test. Nous allons calculer la proportion d'erreur faite pour les arbres précédents. </span>
+<span id="cb14-196"><a href="#cb14-196" aria-hidden="true" tabindex="-1"></a><span class="fu">### Question 5 &lt;a name="Question 5"&gt;&lt;/a&gt;</span></span>
 <span id="cb14-197"><a href="#cb14-197" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-200"><a href="#cb14-200" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb14-201"><a href="#cb14-201" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: FALSE</span></span>
-<span id="cb14-202"><a href="#cb14-202" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-align: center</span></span>
-<span id="cb14-203"><a href="#cb14-203" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">145</span>)</span>
-<span id="cb14-204"><a href="#cb14-204" aria-hidden="true" tabindex="-1"></a>data_test <span class="op">=</span> rand_checkers(<span class="dv">40</span>, <span class="dv">40</span>, <span class="dv">40</span>, <span class="dv">40</span>)</span>
-<span id="cb14-205"><a href="#cb14-205" aria-hidden="true" tabindex="-1"></a>X_test <span class="op">=</span> data_test[:, :<span class="dv">2</span>]</span>
-<span id="cb14-206"><a href="#cb14-206" aria-hidden="true" tabindex="-1"></a>Y_test <span class="op">=</span> data_test[:, <span class="dv">2</span>].astype(<span class="bu">int</span>)</span>
-<span id="cb14-207"><a href="#cb14-207" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-208"><a href="#cb14-208" aria-hidden="true" tabindex="-1"></a>dmax <span class="op">=</span> <span class="dv">15</span></span>
-<span id="cb14-209"><a href="#cb14-209" aria-hidden="true" tabindex="-1"></a>scores_entropy <span class="op">=</span> np.zeros(dmax)</span>
-<span id="cb14-210"><a href="#cb14-210" aria-hidden="true" tabindex="-1"></a>scores_gini <span class="op">=</span> np.zeros(dmax)</span>
-<span id="cb14-211"><a href="#cb14-211" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-212"><a href="#cb14-212" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(dmax):</span>
-<span id="cb14-213"><a href="#cb14-213" aria-hidden="true" tabindex="-1"></a>    dt_entropy <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'entropy'</span>,</span>
-<span id="cb14-214"><a href="#cb14-214" aria-hidden="true" tabindex="-1"></a>                                             max_depth<span class="op">=</span>i <span class="op">+</span> <span class="dv">1</span>)</span>
-<span id="cb14-215"><a href="#cb14-215" aria-hidden="true" tabindex="-1"></a>    dt_entropy.fit(X_train, Y_train)</span>
-<span id="cb14-216"><a href="#cb14-216" aria-hidden="true" tabindex="-1"></a>    scores_entropy[i] <span class="op">=</span> dt_entropy.score(X_test, Y_test)</span>
-<span id="cb14-217"><a href="#cb14-217" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-218"><a href="#cb14-218" aria-hidden="true" tabindex="-1"></a>    dt_gini <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'gini'</span>, max_depth<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span>)</span>
-<span id="cb14-219"><a href="#cb14-219" aria-hidden="true" tabindex="-1"></a>    dt_gini.fit(X_train, Y_train)</span>
-<span id="cb14-220"><a href="#cb14-220" aria-hidden="true" tabindex="-1"></a>    scores_gini[i] <span class="op">=</span> dt_gini.score(X_test, Y_test)</span>
-<span id="cb14-221"><a href="#cb14-221" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-222"><a href="#cb14-222" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-223"><a href="#cb14-223" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">4</span>))</span>
-<span id="cb14-224"><a href="#cb14-224" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="dv">1</span><span class="op">-</span>scores_entropy, label<span class="op">=</span><span class="st">'entropy'</span>)</span>
-<span id="cb14-225"><a href="#cb14-225" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="dv">1</span><span class="op">-</span>scores_gini, label<span class="op">=</span><span class="st">'gini'</span>)</span>
-<span id="cb14-226"><a href="#cb14-226" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">"entropy"</span>, <span class="st">"gini"</span>])</span>
-<span id="cb14-227"><a href="#cb14-227" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Max depth'</span>)</span>
-<span id="cb14-228"><a href="#cb14-228" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Accuracy Score'</span>)</span>
-<span id="cb14-229"><a href="#cb14-229" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Error with entropy and gini criterion'</span>)</span>
-<span id="cb14-230"><a href="#cb14-230" aria-hidden="true" tabindex="-1"></a>plt.draw()</span>
-<span id="cb14-231"><a href="#cb14-231" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Scores with entropy criterion: "</span>, <span class="dv">1</span><span class="op">-</span>scores_entropy)</span>
-<span id="cb14-232"><a href="#cb14-232" aria-hidden="true" tabindex="-1"></a>best_depth <span class="op">=</span> np.argmin(<span class="dv">1</span><span class="op">-</span>scores_entropy)<span class="op">+</span><span class="dv">1</span></span>
-<span id="cb14-233"><a href="#cb14-233" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Best depth for entropy criterion: "</span>, best_depth)</span>
-<span id="cb14-234"><a href="#cb14-234" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-235"><a href="#cb14-235" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-236"><a href="#cb14-236" aria-hidden="true" tabindex="-1"></a>Nous pouvons observer une descente plus rapide mais qui ne mène pas à une erreur nulle. En effet, plus la profondeur est élevée plus l'erreur diminue mais on remarque que l'on obtient une erreur minimale autour de $0.19$. Ce n'est pas très étonnant car cette fois nous avons des données tests différentes des données d'entrainement et donc si on augmente la profondeur, l'erreur diminue.</span>
-<span id="cb14-237"><a href="#cb14-237" aria-hidden="true" tabindex="-1"></a>Dans notre exemple, la valeure de max_depth est donnée par <span class="in">`best_depth`</span>et vaut $8$ pour cette graine. </span>
-<span id="cb14-238"><a href="#cb14-238" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-239"><a href="#cb14-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-198"><a href="#cb14-198" aria-hidden="true" tabindex="-1"></a>Nous allons à présent créer $n=160$ nouvelles données que nous allons utiliser comme données de test. Nous allons calculer la proportion d'erreur faite pour les arbres précédents. </span>
+<span id="cb14-199"><a href="#cb14-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-202"><a href="#cb14-202" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb14-203"><a href="#cb14-203" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: FALSE</span></span>
+<span id="cb14-204"><a href="#cb14-204" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-align: center</span></span>
+<span id="cb14-205"><a href="#cb14-205" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">145</span>)</span>
+<span id="cb14-206"><a href="#cb14-206" aria-hidden="true" tabindex="-1"></a>data_test <span class="op">=</span> rand_checkers(<span class="dv">40</span>, <span class="dv">40</span>, <span class="dv">40</span>, <span class="dv">40</span>)</span>
+<span id="cb14-207"><a href="#cb14-207" aria-hidden="true" tabindex="-1"></a>X_test <span class="op">=</span> data_test[:, :<span class="dv">2</span>]</span>
+<span id="cb14-208"><a href="#cb14-208" aria-hidden="true" tabindex="-1"></a>Y_test <span class="op">=</span> data_test[:, <span class="dv">2</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb14-209"><a href="#cb14-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-210"><a href="#cb14-210" aria-hidden="true" tabindex="-1"></a>dmax <span class="op">=</span> <span class="dv">15</span></span>
+<span id="cb14-211"><a href="#cb14-211" aria-hidden="true" tabindex="-1"></a>scores_entropy <span class="op">=</span> np.zeros(dmax)</span>
+<span id="cb14-212"><a href="#cb14-212" aria-hidden="true" tabindex="-1"></a>scores_gini <span class="op">=</span> np.zeros(dmax)</span>
+<span id="cb14-213"><a href="#cb14-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-214"><a href="#cb14-214" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(dmax):</span>
+<span id="cb14-215"><a href="#cb14-215" aria-hidden="true" tabindex="-1"></a>    dt_entropy <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'entropy'</span>,</span>
+<span id="cb14-216"><a href="#cb14-216" aria-hidden="true" tabindex="-1"></a>                                             max_depth<span class="op">=</span>i <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb14-217"><a href="#cb14-217" aria-hidden="true" tabindex="-1"></a>    dt_entropy.fit(X_train, Y_train)</span>
+<span id="cb14-218"><a href="#cb14-218" aria-hidden="true" tabindex="-1"></a>    scores_entropy[i] <span class="op">=</span> dt_entropy.score(X_test, Y_test)</span>
+<span id="cb14-219"><a href="#cb14-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-220"><a href="#cb14-220" aria-hidden="true" tabindex="-1"></a>    dt_gini <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'gini'</span>, max_depth<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb14-221"><a href="#cb14-221" aria-hidden="true" tabindex="-1"></a>    dt_gini.fit(X_train, Y_train)</span>
+<span id="cb14-222"><a href="#cb14-222" aria-hidden="true" tabindex="-1"></a>    scores_gini[i] <span class="op">=</span> dt_gini.score(X_test, Y_test)</span>
+<span id="cb14-223"><a href="#cb14-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-224"><a href="#cb14-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-225"><a href="#cb14-225" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">4</span>))</span>
+<span id="cb14-226"><a href="#cb14-226" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="dv">1</span><span class="op">-</span>scores_entropy, label<span class="op">=</span><span class="st">'entropy'</span>)</span>
+<span id="cb14-227"><a href="#cb14-227" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="dv">1</span><span class="op">-</span>scores_gini, label<span class="op">=</span><span class="st">'gini'</span>)</span>
+<span id="cb14-228"><a href="#cb14-228" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">"entropy"</span>, <span class="st">"gini"</span>])</span>
+<span id="cb14-229"><a href="#cb14-229" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Max depth'</span>)</span>
+<span id="cb14-230"><a href="#cb14-230" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Accuracy Score'</span>)</span>
+<span id="cb14-231"><a href="#cb14-231" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Error with entropy and gini criterion'</span>)</span>
+<span id="cb14-232"><a href="#cb14-232" aria-hidden="true" tabindex="-1"></a>plt.draw()</span>
+<span id="cb14-233"><a href="#cb14-233" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Scores with entropy criterion: "</span>, <span class="dv">1</span><span class="op">-</span>scores_entropy)</span>
+<span id="cb14-234"><a href="#cb14-234" aria-hidden="true" tabindex="-1"></a>best_depth <span class="op">=</span> np.argmin(<span class="dv">1</span><span class="op">-</span>scores_entropy)<span class="op">+</span><span class="dv">1</span></span>
+<span id="cb14-235"><a href="#cb14-235" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Best depth for entropy criterion: "</span>, best_depth)</span>
+<span id="cb14-236"><a href="#cb14-236" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-237"><a href="#cb14-237" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-238"><a href="#cb14-238" aria-hidden="true" tabindex="-1"></a>Nous pouvons observer une descente plus rapide mais qui ne mène pas à une erreur nulle. En effet, plus la profondeur est élevée plus l'erreur diminue mais on remarque que l'on obtient une erreur minimale autour de $0.19$. Ce n'est pas très étonnant car cette fois nous avons des données tests différentes des données d'entrainement et donc si on augmente la profondeur, l'erreur diminue.</span>
+<span id="cb14-239"><a href="#cb14-239" aria-hidden="true" tabindex="-1"></a>Dans notre exemple, la valeure de max_depth est donnée par <span class="in">`best_depth`</span>et vaut $8$ pour cette graine. </span>
 <span id="cb14-240"><a href="#cb14-240" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-241"><a href="#cb14-241" aria-hidden="true" tabindex="-1"></a><span class="fu">### Question 6 &lt;a name="Question 6"&gt;&lt;/a&gt;</span></span>
+<span id="cb14-241"><a href="#cb14-241" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-242"><a href="#cb14-242" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-243"><a href="#cb14-243" aria-hidden="true" tabindex="-1"></a>Dans cette question nous allons utiliser le jeu de données <span class="in">`digits`</span> qui est disponible dans le package <span class="in">`sklearn`</span>. Le but est de recommencer l'analyse précédente mais pour un vrai jeu de données. </span>
+<span id="cb14-243"><a href="#cb14-243" aria-hidden="true" tabindex="-1"></a><span class="fu">### Question 6 &lt;a name="Question 6"&gt;&lt;/a&gt;</span></span>
 <span id="cb14-244"><a href="#cb14-244" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-245"><a href="#cb14-245" aria-hidden="true" tabindex="-1"></a>On sépare le jeu en deux : $80%$ de données d'apprentissage / $20%$ de données de tests. </span>
+<span id="cb14-245"><a href="#cb14-245" aria-hidden="true" tabindex="-1"></a>Dans cette question nous allons utiliser le jeu de données <span class="in">`digits`</span> qui est disponible dans le package <span class="in">`sklearn`</span>. Le but est de recommencer l'analyse précédente mais pour un vrai jeu de données. </span>
 <span id="cb14-246"><a href="#cb14-246" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-249"><a href="#cb14-249" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb14-250"><a href="#cb14-250" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: FALSE</span></span>
-<span id="cb14-251"><a href="#cb14-251" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>capture</span>
-<span id="cb14-252"><a href="#cb14-252" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">12</span>)</span>
-<span id="cb14-253"><a href="#cb14-253" aria-hidden="true" tabindex="-1"></a><span class="co"># Import the digits dataset</span></span>
-<span id="cb14-254"><a href="#cb14-254" aria-hidden="true" tabindex="-1"></a>digits <span class="op">=</span> datasets.load_digits()</span>
-<span id="cb14-255"><a href="#cb14-255" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-256"><a href="#cb14-256" aria-hidden="true" tabindex="-1"></a><span class="co"># create train and test set</span></span>
-<span id="cb14-257"><a href="#cb14-257" aria-hidden="true" tabindex="-1"></a>X_train, X_test, Y_train, Y_test <span class="op">=</span> train_test_split(digits.data, digits.target, test_size<span class="op">=</span><span class="fl">0.2</span>)</span>
-<span id="cb14-258"><a href="#cb14-258" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-259"><a href="#cb14-259" aria-hidden="true" tabindex="-1"></a>dt_entropy <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'entropy'</span>)</span>
-<span id="cb14-260"><a href="#cb14-260" aria-hidden="true" tabindex="-1"></a>dt_gini <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'gini'</span>)</span>
-<span id="cb14-261"><a href="#cb14-261" aria-hidden="true" tabindex="-1"></a>dt_entropy.fit(X_train, Y_train)</span>
-<span id="cb14-262"><a href="#cb14-262" aria-hidden="true" tabindex="-1"></a>dt_gini.fit(X_train, Y_train)</span>
-<span id="cb14-263"><a href="#cb14-263" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-264"><a href="#cb14-264" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-265"><a href="#cb14-265" aria-hidden="true" tabindex="-1"></a>Nous allons ensuite tracer les courbes d'erreurs pour les deux critères sur l'échantillon d'apprentissage. Nous prenons une profondeur de $15$. </span>
+<span id="cb14-247"><a href="#cb14-247" aria-hidden="true" tabindex="-1"></a>On sépare le jeu en deux : $80%$ de données d'apprentissage / $20%$ de données de tests. </span>
+<span id="cb14-248"><a href="#cb14-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-251"><a href="#cb14-251" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb14-252"><a href="#cb14-252" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: FALSE</span></span>
+<span id="cb14-253"><a href="#cb14-253" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>capture</span>
+<span id="cb14-254"><a href="#cb14-254" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">12</span>)</span>
+<span id="cb14-255"><a href="#cb14-255" aria-hidden="true" tabindex="-1"></a><span class="co"># Import the digits dataset</span></span>
+<span id="cb14-256"><a href="#cb14-256" aria-hidden="true" tabindex="-1"></a>digits <span class="op">=</span> datasets.load_digits()</span>
+<span id="cb14-257"><a href="#cb14-257" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-258"><a href="#cb14-258" aria-hidden="true" tabindex="-1"></a><span class="co"># create train and test set</span></span>
+<span id="cb14-259"><a href="#cb14-259" aria-hidden="true" tabindex="-1"></a>X_train, X_test, Y_train, Y_test <span class="op">=</span> train_test_split(digits.data, digits.target, test_size<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb14-260"><a href="#cb14-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-261"><a href="#cb14-261" aria-hidden="true" tabindex="-1"></a>dt_entropy <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'entropy'</span>)</span>
+<span id="cb14-262"><a href="#cb14-262" aria-hidden="true" tabindex="-1"></a>dt_gini <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'gini'</span>)</span>
+<span id="cb14-263"><a href="#cb14-263" aria-hidden="true" tabindex="-1"></a>dt_entropy.fit(X_train, Y_train)</span>
+<span id="cb14-264"><a href="#cb14-264" aria-hidden="true" tabindex="-1"></a>dt_gini.fit(X_train, Y_train)</span>
+<span id="cb14-265"><a href="#cb14-265" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb14-266"><a href="#cb14-266" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-269"><a href="#cb14-269" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb14-270"><a href="#cb14-270" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: FALSE</span></span>
-<span id="cb14-271"><a href="#cb14-271" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: FALSE</span></span>
-<span id="cb14-272"><a href="#cb14-272" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-align: center</span></span>
-<span id="cb14-273"><a href="#cb14-273" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">12</span>)</span>
-<span id="cb14-274"><a href="#cb14-274" aria-hidden="true" tabindex="-1"></a>dmax <span class="op">=</span> <span class="dv">15</span></span>
-<span id="cb14-275"><a href="#cb14-275" aria-hidden="true" tabindex="-1"></a>scores_entropy <span class="op">=</span> np.zeros(dmax)</span>
-<span id="cb14-276"><a href="#cb14-276" aria-hidden="true" tabindex="-1"></a>scores_gini <span class="op">=</span> np.zeros(dmax)</span>
-<span id="cb14-277"><a href="#cb14-277" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-278"><a href="#cb14-278" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(dmax):</span>
-<span id="cb14-279"><a href="#cb14-279" aria-hidden="true" tabindex="-1"></a>    dt_entropy <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'entropy'</span>,</span>
-<span id="cb14-280"><a href="#cb14-280" aria-hidden="true" tabindex="-1"></a>                                             max_depth<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span>)</span>
-<span id="cb14-281"><a href="#cb14-281" aria-hidden="true" tabindex="-1"></a>    dt_entropy.fit(X_train, Y_train)</span>
-<span id="cb14-282"><a href="#cb14-282" aria-hidden="true" tabindex="-1"></a>    scores_entropy[i] <span class="op">=</span> dt_entropy.score(X_train, Y_train)</span>
-<span id="cb14-283"><a href="#cb14-283" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-284"><a href="#cb14-284" aria-hidden="true" tabindex="-1"></a>    dt_gini <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'gini'</span>, max_depth<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span>)</span>
-<span id="cb14-285"><a href="#cb14-285" aria-hidden="true" tabindex="-1"></a>    dt_gini.fit(X_train, Y_train)</span>
-<span id="cb14-286"><a href="#cb14-286" aria-hidden="true" tabindex="-1"></a>    scores_gini[i] <span class="op">=</span> dt_gini.score(X_train, Y_train)</span>
-<span id="cb14-287"><a href="#cb14-287" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-288"><a href="#cb14-288" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">4</span>))</span>
-<span id="cb14-289"><a href="#cb14-289" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="dv">1</span><span class="op">-</span>scores_entropy, label<span class="op">=</span><span class="st">'entropy'</span>)</span>
-<span id="cb14-290"><a href="#cb14-290" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="dv">1</span><span class="op">-</span>scores_gini, label<span class="op">=</span><span class="st">'gini'</span>)</span>
-<span id="cb14-291"><a href="#cb14-291" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Max depth'</span>)</span>
-<span id="cb14-292"><a href="#cb14-292" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Accuracy Score'</span>)</span>
-<span id="cb14-293"><a href="#cb14-293" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">"entropy"</span>, <span class="st">"gini"</span>])</span>
-<span id="cb14-294"><a href="#cb14-294" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Error with entropy and gini criterion'</span>)</span>
-<span id="cb14-295"><a href="#cb14-295" aria-hidden="true" tabindex="-1"></a>plt.draw()</span>
-<span id="cb14-296"><a href="#cb14-296" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Error with entropy criterion: "</span>, <span class="dv">1</span><span class="op">-</span>scores_entropy)</span>
-<span id="cb14-297"><a href="#cb14-297" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Error with Gini criterion: "</span>, <span class="dv">1</span><span class="op">-</span>scores_gini)</span>
-<span id="cb14-298"><a href="#cb14-298" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-299"><a href="#cb14-299" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-300"><a href="#cb14-300" aria-hidden="true" tabindex="-1"></a>Nous pouvons observer sans grande surprise que l'erreur diminue jusqu'à atteindre la valeur nulle. C'est cohérent avec ce que nous avions constaté au début.</span>
+<span id="cb14-267"><a href="#cb14-267" aria-hidden="true" tabindex="-1"></a>Nous allons ensuite tracer les courbes d'erreurs pour les deux critères sur l'échantillon d'apprentissage. Nous prenons une profondeur de $15$. </span>
+<span id="cb14-268"><a href="#cb14-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-271"><a href="#cb14-271" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb14-272"><a href="#cb14-272" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: FALSE</span></span>
+<span id="cb14-273"><a href="#cb14-273" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: FALSE</span></span>
+<span id="cb14-274"><a href="#cb14-274" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-align: center</span></span>
+<span id="cb14-275"><a href="#cb14-275" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">12</span>)</span>
+<span id="cb14-276"><a href="#cb14-276" aria-hidden="true" tabindex="-1"></a>dmax <span class="op">=</span> <span class="dv">15</span></span>
+<span id="cb14-277"><a href="#cb14-277" aria-hidden="true" tabindex="-1"></a>scores_entropy <span class="op">=</span> np.zeros(dmax)</span>
+<span id="cb14-278"><a href="#cb14-278" aria-hidden="true" tabindex="-1"></a>scores_gini <span class="op">=</span> np.zeros(dmax)</span>
+<span id="cb14-279"><a href="#cb14-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-280"><a href="#cb14-280" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(dmax):</span>
+<span id="cb14-281"><a href="#cb14-281" aria-hidden="true" tabindex="-1"></a>    dt_entropy <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'entropy'</span>,</span>
+<span id="cb14-282"><a href="#cb14-282" aria-hidden="true" tabindex="-1"></a>                                             max_depth<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb14-283"><a href="#cb14-283" aria-hidden="true" tabindex="-1"></a>    dt_entropy.fit(X_train, Y_train)</span>
+<span id="cb14-284"><a href="#cb14-284" aria-hidden="true" tabindex="-1"></a>    scores_entropy[i] <span class="op">=</span> dt_entropy.score(X_train, Y_train)</span>
+<span id="cb14-285"><a href="#cb14-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-286"><a href="#cb14-286" aria-hidden="true" tabindex="-1"></a>    dt_gini <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'gini'</span>, max_depth<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb14-287"><a href="#cb14-287" aria-hidden="true" tabindex="-1"></a>    dt_gini.fit(X_train, Y_train)</span>
+<span id="cb14-288"><a href="#cb14-288" aria-hidden="true" tabindex="-1"></a>    scores_gini[i] <span class="op">=</span> dt_gini.score(X_train, Y_train)</span>
+<span id="cb14-289"><a href="#cb14-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-290"><a href="#cb14-290" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">4</span>))</span>
+<span id="cb14-291"><a href="#cb14-291" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="dv">1</span><span class="op">-</span>scores_entropy, label<span class="op">=</span><span class="st">'entropy'</span>)</span>
+<span id="cb14-292"><a href="#cb14-292" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="dv">1</span><span class="op">-</span>scores_gini, label<span class="op">=</span><span class="st">'gini'</span>)</span>
+<span id="cb14-293"><a href="#cb14-293" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Max depth'</span>)</span>
+<span id="cb14-294"><a href="#cb14-294" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Accuracy Score'</span>)</span>
+<span id="cb14-295"><a href="#cb14-295" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">"entropy"</span>, <span class="st">"gini"</span>])</span>
+<span id="cb14-296"><a href="#cb14-296" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Error with entropy and gini criterion'</span>)</span>
+<span id="cb14-297"><a href="#cb14-297" aria-hidden="true" tabindex="-1"></a>plt.draw()</span>
+<span id="cb14-298"><a href="#cb14-298" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Error with entropy criterion: "</span>, <span class="dv">1</span><span class="op">-</span>scores_entropy)</span>
+<span id="cb14-299"><a href="#cb14-299" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Error with Gini criterion: "</span>, <span class="dv">1</span><span class="op">-</span>scores_gini)</span>
+<span id="cb14-300"><a href="#cb14-300" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb14-301"><a href="#cb14-301" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-302"><a href="#cb14-302" aria-hidden="true" tabindex="-1"></a>Nous pouvons maintenant regarder l'erreur sur les données tests, ce qui nous intéressent le plus. Nous avons initialisé la profondeur maximum à $20$. </span>
+<span id="cb14-302"><a href="#cb14-302" aria-hidden="true" tabindex="-1"></a>Nous pouvons observer sans grande surprise que l'erreur diminue jusqu'à atteindre la valeur nulle. C'est cohérent avec ce que nous avions constaté au début.</span>
 <span id="cb14-303"><a href="#cb14-303" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-306"><a href="#cb14-306" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb14-307"><a href="#cb14-307" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: FALSE</span></span>
-<span id="cb14-308"><a href="#cb14-308" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: FALSE</span></span>
-<span id="cb14-309"><a href="#cb14-309" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-align: center</span></span>
-<span id="cb14-310"><a href="#cb14-310" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">12</span>)</span>
-<span id="cb14-311"><a href="#cb14-311" aria-hidden="true" tabindex="-1"></a>dmax <span class="op">=</span> <span class="dv">20</span></span>
-<span id="cb14-312"><a href="#cb14-312" aria-hidden="true" tabindex="-1"></a>scores_entropy <span class="op">=</span> np.zeros(dmax)</span>
-<span id="cb14-313"><a href="#cb14-313" aria-hidden="true" tabindex="-1"></a>scores_gini <span class="op">=</span> np.zeros(dmax)</span>
-<span id="cb14-314"><a href="#cb14-314" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-315"><a href="#cb14-315" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(dmax):</span>
-<span id="cb14-316"><a href="#cb14-316" aria-hidden="true" tabindex="-1"></a>    dt_entropy <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'entropy'</span>,</span>
-<span id="cb14-317"><a href="#cb14-317" aria-hidden="true" tabindex="-1"></a>                                             max_depth<span class="op">=</span>i <span class="op">+</span> <span class="dv">1</span>)</span>
-<span id="cb14-318"><a href="#cb14-318" aria-hidden="true" tabindex="-1"></a>    dt_entropy.fit(X_train, Y_train)</span>
-<span id="cb14-319"><a href="#cb14-319" aria-hidden="true" tabindex="-1"></a>    scores_entropy[i] <span class="op">=</span> dt_entropy.score(X_test, Y_test)</span>
-<span id="cb14-320"><a href="#cb14-320" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-321"><a href="#cb14-321" aria-hidden="true" tabindex="-1"></a>    dt_gini <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'gini'</span>, max_depth<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span>)</span>
-<span id="cb14-322"><a href="#cb14-322" aria-hidden="true" tabindex="-1"></a>    dt_gini.fit(X_train, Y_train)</span>
-<span id="cb14-323"><a href="#cb14-323" aria-hidden="true" tabindex="-1"></a>    scores_gini[i] <span class="op">=</span> dt_gini.score(X_test, Y_test)</span>
-<span id="cb14-324"><a href="#cb14-324" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-325"><a href="#cb14-325" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">4</span>))</span>
-<span id="cb14-326"><a href="#cb14-326" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="dv">1</span><span class="op">-</span>scores_entropy, label<span class="op">=</span><span class="st">'entropy'</span>)</span>
-<span id="cb14-327"><a href="#cb14-327" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="dv">1</span><span class="op">-</span>scores_gini, label<span class="op">=</span><span class="st">'gini'</span>)</span>
-<span id="cb14-328"><a href="#cb14-328" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">"entropy"</span>, <span class="st">"gini"</span>])</span>
-<span id="cb14-329"><a href="#cb14-329" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Max depth'</span>)</span>
-<span id="cb14-330"><a href="#cb14-330" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Accuracy Score'</span>)</span>
-<span id="cb14-331"><a href="#cb14-331" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Error with entropy and gini criterion'</span>)</span>
-<span id="cb14-332"><a href="#cb14-332" aria-hidden="true" tabindex="-1"></a>plt.draw()</span>
-<span id="cb14-333"><a href="#cb14-333" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Error with entropy criterion: "</span>, <span class="dv">1</span><span class="op">-</span>scores_entropy)</span>
-<span id="cb14-334"><a href="#cb14-334" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-335"><a href="#cb14-335" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-304"><a href="#cb14-304" aria-hidden="true" tabindex="-1"></a>Nous pouvons maintenant regarder l'erreur sur les données tests, ce qui nous intéressent le plus. Nous avons initialisé la profondeur maximum à $20$. </span>
+<span id="cb14-305"><a href="#cb14-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-308"><a href="#cb14-308" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb14-309"><a href="#cb14-309" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: FALSE</span></span>
+<span id="cb14-310"><a href="#cb14-310" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: FALSE</span></span>
+<span id="cb14-311"><a href="#cb14-311" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-align: center</span></span>
+<span id="cb14-312"><a href="#cb14-312" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">12</span>)</span>
+<span id="cb14-313"><a href="#cb14-313" aria-hidden="true" tabindex="-1"></a>dmax <span class="op">=</span> <span class="dv">20</span></span>
+<span id="cb14-314"><a href="#cb14-314" aria-hidden="true" tabindex="-1"></a>scores_entropy <span class="op">=</span> np.zeros(dmax)</span>
+<span id="cb14-315"><a href="#cb14-315" aria-hidden="true" tabindex="-1"></a>scores_gini <span class="op">=</span> np.zeros(dmax)</span>
+<span id="cb14-316"><a href="#cb14-316" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-317"><a href="#cb14-317" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(dmax):</span>
+<span id="cb14-318"><a href="#cb14-318" aria-hidden="true" tabindex="-1"></a>    dt_entropy <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'entropy'</span>,</span>
+<span id="cb14-319"><a href="#cb14-319" aria-hidden="true" tabindex="-1"></a>                                             max_depth<span class="op">=</span>i <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb14-320"><a href="#cb14-320" aria-hidden="true" tabindex="-1"></a>    dt_entropy.fit(X_train, Y_train)</span>
+<span id="cb14-321"><a href="#cb14-321" aria-hidden="true" tabindex="-1"></a>    scores_entropy[i] <span class="op">=</span> dt_entropy.score(X_test, Y_test)</span>
+<span id="cb14-322"><a href="#cb14-322" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-323"><a href="#cb14-323" aria-hidden="true" tabindex="-1"></a>    dt_gini <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'gini'</span>, max_depth<span class="op">=</span>i<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb14-324"><a href="#cb14-324" aria-hidden="true" tabindex="-1"></a>    dt_gini.fit(X_train, Y_train)</span>
+<span id="cb14-325"><a href="#cb14-325" aria-hidden="true" tabindex="-1"></a>    scores_gini[i] <span class="op">=</span> dt_gini.score(X_test, Y_test)</span>
+<span id="cb14-326"><a href="#cb14-326" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-327"><a href="#cb14-327" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">4</span>))</span>
+<span id="cb14-328"><a href="#cb14-328" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="dv">1</span><span class="op">-</span>scores_entropy, label<span class="op">=</span><span class="st">'entropy'</span>)</span>
+<span id="cb14-329"><a href="#cb14-329" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="dv">1</span><span class="op">-</span>scores_gini, label<span class="op">=</span><span class="st">'gini'</span>)</span>
+<span id="cb14-330"><a href="#cb14-330" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">"entropy"</span>, <span class="st">"gini"</span>])</span>
+<span id="cb14-331"><a href="#cb14-331" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Max depth'</span>)</span>
+<span id="cb14-332"><a href="#cb14-332" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Accuracy Score'</span>)</span>
+<span id="cb14-333"><a href="#cb14-333" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Error with entropy and gini criterion'</span>)</span>
+<span id="cb14-334"><a href="#cb14-334" aria-hidden="true" tabindex="-1"></a>plt.draw()</span>
+<span id="cb14-335"><a href="#cb14-335" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Error with entropy criterion: "</span>, <span class="dv">1</span><span class="op">-</span>scores_entropy)</span>
 <span id="cb14-336"><a href="#cb14-336" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-337"><a href="#cb14-337" aria-hidden="true" tabindex="-1"></a>Pour les données tests nous obtenons une erreur qui diminue également et qui "stagne" autour de $0.15$. On arrive à peu près à cette valeur lorsque la profondeur arrive à $7$. Pour ce jeu de données, on voit donc qu'il n'y a pas besoin d'une grande profondeur pour obtenir des erreurs plus faibles. </span>
+<span id="cb14-337"><a href="#cb14-337" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb14-338"><a href="#cb14-338" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-339"><a href="#cb14-339" aria-hidden="true" tabindex="-1"></a>Malheureusement, en réalité, nous n'avons pas toujours un ensemble de test à disposition.</span>
+<span id="cb14-339"><a href="#cb14-339" aria-hidden="true" tabindex="-1"></a>Pour les données tests nous obtenons une erreur qui diminue également et qui "stagne" autour de $0.15$. On arrive à peu près à cette valeur lorsque la profondeur arrive à $7$. Pour ce jeu de données, on voit donc qu'il n'y a pas besoin d'une grande profondeur pour obtenir des erreurs plus faibles. </span>
 <span id="cb14-340"><a href="#cb14-340" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-341"><a href="#cb14-341" aria-hidden="true" tabindex="-1"></a><span class="fu">## Méthodes de choix de paramètres - Sélection de modèle</span></span>
-<span id="cb14-342"><a href="#cb14-342" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;a</span> <span class="er">name</span><span class="ot">=</span><span class="st">"Méthodes de choix de paramètres"</span><span class="kw">&gt;&lt;/a&gt;</span></span>
-<span id="cb14-343"><a href="#cb14-343" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-344"><a href="#cb14-344" aria-hidden="true" tabindex="-1"></a>Pour sélectionner un modèle ou un paramètre tout en considérant le plus grand nombre d'exemples possibles pour l'apprentissage, on utilise généralement une sélection par validation croisée. </span>
+<span id="cb14-341"><a href="#cb14-341" aria-hidden="true" tabindex="-1"></a>Malheureusement, en réalité, nous n'avons pas toujours un ensemble de test à disposition.</span>
+<span id="cb14-342"><a href="#cb14-342" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-343"><a href="#cb14-343" aria-hidden="true" tabindex="-1"></a><span class="fu">## Méthodes de choix de paramètres - Sélection de modèle</span></span>
+<span id="cb14-344"><a href="#cb14-344" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;a</span> <span class="er">name</span><span class="ot">=</span><span class="st">"Méthodes de choix de paramètres"</span><span class="kw">&gt;&lt;/a&gt;</span></span>
 <span id="cb14-345"><a href="#cb14-345" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-346"><a href="#cb14-346" aria-hidden="true" tabindex="-1"></a><span class="fu">### Question 7 &lt;a name="Question 7"&gt;&lt;/a&gt;</span></span>
+<span id="cb14-346"><a href="#cb14-346" aria-hidden="true" tabindex="-1"></a>Pour sélectionner un modèle ou un paramètre tout en considérant le plus grand nombre d'exemples possibles pour l'apprentissage, on utilise généralement une sélection par validation croisée. </span>
 <span id="cb14-347"><a href="#cb14-347" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-348"><a href="#cb14-348" aria-hidden="true" tabindex="-1"></a>La fonction <span class="in">`cross_val_score`</span> réalise une validation croisée poour nous permettre de trouver la profondeur de l'arbre qui minimise l'erreur. cette fonction prend en entrée un arbre, selon un critère et une profondeur maximum ainsi que les observations $X$ et les réponses $y$ de nos données.</span>
+<span id="cb14-348"><a href="#cb14-348" aria-hidden="true" tabindex="-1"></a><span class="fu">### Question 7 &lt;a name="Question 7"&gt;&lt;/a&gt;</span></span>
 <span id="cb14-349"><a href="#cb14-349" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-350"><a href="#cb14-350" aria-hidden="true" tabindex="-1"></a>La fonction va choisir un ensemble d'entrainement et un ensemble de test dans $X$, l'arbre va apprendre sur les données d'entrainement, puis tester sur les données tests et ensuite on va regarder la véracité des résultats par rapport aux réponses $y$. <span class="in">`cross_val_score`</span> réalise plusieurs fois ce schéma (argument: <span class="in">`cv=10`</span>) puis nous obtenons un vecteur avec les scores. </span>
+<span id="cb14-350"><a href="#cb14-350" aria-hidden="true" tabindex="-1"></a>La fonction <span class="in">`cross_val_score`</span> réalise une validation croisée poour nous permettre de trouver la profondeur de l'arbre qui minimise l'erreur. cette fonction prend en entrée un arbre, selon un critère et une profondeur maximum ainsi que les observations $X$ et les réponses $y$ de nos données.</span>
 <span id="cb14-351"><a href="#cb14-351" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-352"><a href="#cb14-352" aria-hidden="true" tabindex="-1"></a>Nous allons, suite à cela, faire la moyenne de ces valeurs. Ce schéma sera répété plusieurs fois en fonction de la profondeur de l'arbre.</span>
+<span id="cb14-352"><a href="#cb14-352" aria-hidden="true" tabindex="-1"></a>La fonction va choisir un ensemble d'entrainement et un ensemble de test dans $X$, l'arbre va apprendre sur les données d'entrainement, puis tester sur les données tests et ensuite on va regarder la véracité des résultats par rapport aux réponses $y$. <span class="in">`cross_val_score`</span> réalise plusieurs fois ce schéma (argument: <span class="in">`cv=10`</span>) puis nous obtenons un vecteur avec les scores. </span>
 <span id="cb14-353"><a href="#cb14-353" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-356"><a href="#cb14-356" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb14-357"><a href="#cb14-357" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-align: center</span></span>
-<span id="cb14-358"><a href="#cb14-358" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">12</span>)</span>
-<span id="cb14-359"><a href="#cb14-359" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-360"><a href="#cb14-360" aria-hidden="true" tabindex="-1"></a>error_ent <span class="op">=</span> []</span>
-<span id="cb14-361"><a href="#cb14-361" aria-hidden="true" tabindex="-1"></a>error_gini <span class="op">=</span> []</span>
-<span id="cb14-362"><a href="#cb14-362" aria-hidden="true" tabindex="-1"></a>dmax <span class="op">=</span> <span class="dv">12</span></span>
-<span id="cb14-363"><a href="#cb14-363" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> digits.data</span>
-<span id="cb14-364"><a href="#cb14-364" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> digits.target</span>
-<span id="cb14-365"><a href="#cb14-365" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(dmax):</span>
-<span id="cb14-366"><a href="#cb14-366" aria-hidden="true" tabindex="-1"></a>    dt_entropy <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'entropy'</span>,</span>
-<span id="cb14-367"><a href="#cb14-367" aria-hidden="true" tabindex="-1"></a>                                             max_depth<span class="op">=</span>i <span class="op">+</span> <span class="dv">1</span>)</span>
-<span id="cb14-368"><a href="#cb14-368" aria-hidden="true" tabindex="-1"></a>    accuracy <span class="op">=</span> cross_val_score(dt_entropy, X, y, cv<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb14-369"><a href="#cb14-369" aria-hidden="true" tabindex="-1"></a>    error_ent.append(<span class="dv">1</span><span class="op">-</span>accuracy.mean())</span>
-<span id="cb14-370"><a href="#cb14-370" aria-hidden="true" tabindex="-1"></a>    dt_gini <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'gini'</span>,</span>
-<span id="cb14-371"><a href="#cb14-371" aria-hidden="true" tabindex="-1"></a>                                          max_depth<span class="op">=</span>i <span class="op">+</span> <span class="dv">1</span>)</span>
-<span id="cb14-372"><a href="#cb14-372" aria-hidden="true" tabindex="-1"></a>    accuracy2 <span class="op">=</span> cross_val_score(dt_gini, X, y, cv<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb14-373"><a href="#cb14-373" aria-hidden="true" tabindex="-1"></a>    error_gini.append(<span class="dv">1</span><span class="op">-</span>accuracy2.mean())</span>
-<span id="cb14-374"><a href="#cb14-374" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-375"><a href="#cb14-375" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">4</span>))</span>
-<span id="cb14-376"><a href="#cb14-376" aria-hidden="true" tabindex="-1"></a>plt.plot(error_ent, label<span class="op">=</span><span class="st">"entropy"</span>)</span>
-<span id="cb14-377"><a href="#cb14-377" aria-hidden="true" tabindex="-1"></a>plt.plot(error_gini, label<span class="op">=</span><span class="st">"gini"</span>)</span>
-<span id="cb14-378"><a href="#cb14-378" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Depth'</span>)</span>
-<span id="cb14-379"><a href="#cb14-379" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Error"</span>)</span>
-<span id="cb14-380"><a href="#cb14-380" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb14-381"><a href="#cb14-381" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Error with entropy and gini criterion"</span>)</span>
-<span id="cb14-382"><a href="#cb14-382" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb14-383"><a href="#cb14-383" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-384"><a href="#cb14-384" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(error_ent)</span>
-<span id="cb14-385"><a href="#cb14-385" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(error_gini)</span>
-<span id="cb14-386"><a href="#cb14-386" aria-hidden="true" tabindex="-1"></a>best_depth <span class="op">=</span> np.argmin(error_ent) <span class="op">+</span> <span class="dv">1</span></span>
-<span id="cb14-387"><a href="#cb14-387" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(best_depth)</span>
-<span id="cb14-388"><a href="#cb14-388" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-389"><a href="#cb14-389" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-390"><a href="#cb14-390" aria-hidden="true" tabindex="-1"></a>Nous obtenons une erreur qui descend jusqu'à environ $0.2$ pour $depth=6$ puis qui "stagne". La meilleure valeur pour la profondeur est $8$ pour cette graine là. La répartition réalisée par la validation croisée est aléatoire et donc nous pouvons obtenir des résultats avec une profondeur plus faible comme plus élevé pour un même jeu de données. Cependant, comme nous avons réalisé une moyenne avec cette méthode nous aurons quand même des valeurs plutôt proches.  </span>
+<span id="cb14-354"><a href="#cb14-354" aria-hidden="true" tabindex="-1"></a>Nous allons, suite à cela, faire la moyenne de ces valeurs. Ce schéma sera répété plusieurs fois en fonction de la profondeur de l'arbre.</span>
+<span id="cb14-355"><a href="#cb14-355" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-358"><a href="#cb14-358" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb14-359"><a href="#cb14-359" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-align: center</span></span>
+<span id="cb14-360"><a href="#cb14-360" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">12</span>)</span>
+<span id="cb14-361"><a href="#cb14-361" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-362"><a href="#cb14-362" aria-hidden="true" tabindex="-1"></a>error_ent <span class="op">=</span> []</span>
+<span id="cb14-363"><a href="#cb14-363" aria-hidden="true" tabindex="-1"></a>error_gini <span class="op">=</span> []</span>
+<span id="cb14-364"><a href="#cb14-364" aria-hidden="true" tabindex="-1"></a>dmax <span class="op">=</span> <span class="dv">12</span></span>
+<span id="cb14-365"><a href="#cb14-365" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> digits.data</span>
+<span id="cb14-366"><a href="#cb14-366" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> digits.target</span>
+<span id="cb14-367"><a href="#cb14-367" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(dmax):</span>
+<span id="cb14-368"><a href="#cb14-368" aria-hidden="true" tabindex="-1"></a>    dt_entropy <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'entropy'</span>,</span>
+<span id="cb14-369"><a href="#cb14-369" aria-hidden="true" tabindex="-1"></a>                                             max_depth<span class="op">=</span>i <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb14-370"><a href="#cb14-370" aria-hidden="true" tabindex="-1"></a>    accuracy <span class="op">=</span> cross_val_score(dt_entropy, X, y, cv<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb14-371"><a href="#cb14-371" aria-hidden="true" tabindex="-1"></a>    error_ent.append(<span class="dv">1</span><span class="op">-</span>accuracy.mean())</span>
+<span id="cb14-372"><a href="#cb14-372" aria-hidden="true" tabindex="-1"></a>    dt_gini <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'gini'</span>,</span>
+<span id="cb14-373"><a href="#cb14-373" aria-hidden="true" tabindex="-1"></a>                                          max_depth<span class="op">=</span>i <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb14-374"><a href="#cb14-374" aria-hidden="true" tabindex="-1"></a>    accuracy2 <span class="op">=</span> cross_val_score(dt_gini, X, y, cv<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb14-375"><a href="#cb14-375" aria-hidden="true" tabindex="-1"></a>    error_gini.append(<span class="dv">1</span><span class="op">-</span>accuracy2.mean())</span>
+<span id="cb14-376"><a href="#cb14-376" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-377"><a href="#cb14-377" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">4</span>))</span>
+<span id="cb14-378"><a href="#cb14-378" aria-hidden="true" tabindex="-1"></a>plt.plot(error_ent, label<span class="op">=</span><span class="st">"entropy"</span>)</span>
+<span id="cb14-379"><a href="#cb14-379" aria-hidden="true" tabindex="-1"></a>plt.plot(error_gini, label<span class="op">=</span><span class="st">"gini"</span>)</span>
+<span id="cb14-380"><a href="#cb14-380" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Depth'</span>)</span>
+<span id="cb14-381"><a href="#cb14-381" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Error"</span>)</span>
+<span id="cb14-382"><a href="#cb14-382" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb14-383"><a href="#cb14-383" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Error with entropy and gini criterion"</span>)</span>
+<span id="cb14-384"><a href="#cb14-384" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb14-385"><a href="#cb14-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-386"><a href="#cb14-386" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(error_ent)</span>
+<span id="cb14-387"><a href="#cb14-387" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(error_gini)</span>
+<span id="cb14-388"><a href="#cb14-388" aria-hidden="true" tabindex="-1"></a>best_depth <span class="op">=</span> np.argmin(error_ent) <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb14-389"><a href="#cb14-389" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(best_depth)</span>
+<span id="cb14-390"><a href="#cb14-390" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb14-391"><a href="#cb14-391" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-392"><a href="#cb14-392" aria-hidden="true" tabindex="-1"></a><span class="fu">### Question 8 &lt;a name="Question 8"&gt;&lt;/a&gt;</span></span>
+<span id="cb14-392"><a href="#cb14-392" aria-hidden="true" tabindex="-1"></a>Nous obtenons une erreur qui descend jusqu'à environ $0.2$ pour $depth=6$ puis qui "stagne". La meilleure valeur pour la profondeur est $8$ pour cette graine là. La répartition réalisée par la validation croisée est aléatoire et donc nous pouvons obtenir des résultats avec une profondeur plus faible comme plus élevé pour un même jeu de données. Cependant, comme nous avons réalisé une moyenne avec cette méthode nous aurons quand même des valeurs plutôt proches.  </span>
 <span id="cb14-393"><a href="#cb14-393" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-394"><a href="#cb14-394" aria-hidden="true" tabindex="-1"></a>Pour cette question, nous allons tracer les courbes d'apprentissage en fonction de la taille de l'ensemble d'entrainement. Les courbes d'apprentissage nous donne une valeur du score pour des ensembles de tailles différentes. Nous tracerons les courbes avec les "intervalles de confiance", c'est-à-dire la dispersion des scores lors de la validation croisée. </span>
+<span id="cb14-394"><a href="#cb14-394" aria-hidden="true" tabindex="-1"></a><span class="fu">### Question 8 &lt;a name="Question 8"&gt;&lt;/a&gt;</span></span>
 <span id="cb14-395"><a href="#cb14-395" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-398"><a href="#cb14-398" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb14-399"><a href="#cb14-399" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-align: center</span></span>
-<span id="cb14-400"><a href="#cb14-400" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">12</span>)</span>
-<span id="cb14-401"><a href="#cb14-401" aria-hidden="true" tabindex="-1"></a><span class="co"># modèle d'apprentissage</span></span>
-<span id="cb14-402"><a href="#cb14-402" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-403"><a href="#cb14-403" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> digits.data</span>
-<span id="cb14-404"><a href="#cb14-404" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> digits.target</span>
-<span id="cb14-405"><a href="#cb14-405" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'entropy'</span>, max_depth<span class="op">=</span>best_depth)</span>
-<span id="cb14-406"><a href="#cb14-406" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-407"><a href="#cb14-407" aria-hidden="true" tabindex="-1"></a><span class="co"># Générer la courbe d'apprentissage</span></span>
-<span id="cb14-408"><a href="#cb14-408" aria-hidden="true" tabindex="-1"></a>n_samples, train_scores, test_scores <span class="op">=</span> learning_curve(model, X, y, cv<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb14-409"><a href="#cb14-409" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-410"><a href="#cb14-410" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculer les moyennes et les écarts types des scores d'entraînement</span></span>
-<span id="cb14-411"><a href="#cb14-411" aria-hidden="true" tabindex="-1"></a><span class="co"># et de test</span></span>
-<span id="cb14-412"><a href="#cb14-412" aria-hidden="true" tabindex="-1"></a>train_scores_mean <span class="op">=</span> np.mean(train_scores, axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb14-413"><a href="#cb14-413" aria-hidden="true" tabindex="-1"></a>train_scores_std <span class="op">=</span> np.std(train_scores, axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb14-414"><a href="#cb14-414" aria-hidden="true" tabindex="-1"></a>test_scores_mean <span class="op">=</span> np.mean(test_scores, axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb14-415"><a href="#cb14-415" aria-hidden="true" tabindex="-1"></a>test_scores_std <span class="op">=</span> np.std(test_scores, axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb14-416"><a href="#cb14-416" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-417"><a href="#cb14-417" aria-hidden="true" tabindex="-1"></a><span class="co"># Tracer la courbe d'apprentissage avec intervalle de confiance</span></span>
-<span id="cb14-418"><a href="#cb14-418" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
-<span id="cb14-419"><a href="#cb14-419" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Learning curve"</span>)</span>
-<span id="cb14-420"><a href="#cb14-420" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Training set size"</span>)</span>
-<span id="cb14-421"><a href="#cb14-421" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Score"</span>)</span>
-<span id="cb14-422"><a href="#cb14-422" aria-hidden="true" tabindex="-1"></a>plt.grid()</span>
-<span id="cb14-423"><a href="#cb14-423" aria-hidden="true" tabindex="-1"></a>plt.fill_between(n_samples, train_scores_mean <span class="op">-</span> train_scores_std,</span>
-<span id="cb14-424"><a href="#cb14-424" aria-hidden="true" tabindex="-1"></a>                 train_scores_mean <span class="op">+</span> train_scores_std, alpha<span class="op">=</span><span class="fl">0.1</span>,</span>
-<span id="cb14-425"><a href="#cb14-425" aria-hidden="true" tabindex="-1"></a>                 color<span class="op">=</span><span class="st">"red"</span>)</span>
-<span id="cb14-426"><a href="#cb14-426" aria-hidden="true" tabindex="-1"></a>plt.fill_between(n_samples, test_scores_mean <span class="op">-</span> test_scores_std,</span>
-<span id="cb14-427"><a href="#cb14-427" aria-hidden="true" tabindex="-1"></a>                 test_scores_mean <span class="op">+</span> test_scores_std, alpha<span class="op">=</span><span class="fl">0.1</span>,</span>
-<span id="cb14-428"><a href="#cb14-428" aria-hidden="true" tabindex="-1"></a>                 color<span class="op">=</span><span class="st">"green"</span>)</span>
-<span id="cb14-429"><a href="#cb14-429" aria-hidden="true" tabindex="-1"></a>plt.plot(n_samples, train_scores_mean, <span class="st">'o-'</span>, color<span class="op">=</span><span class="st">"red"</span>,</span>
-<span id="cb14-430"><a href="#cb14-430" aria-hidden="true" tabindex="-1"></a>         label<span class="op">=</span><span class="st">"Train score"</span>)</span>
-<span id="cb14-431"><a href="#cb14-431" aria-hidden="true" tabindex="-1"></a>plt.plot(n_samples, test_scores_mean, <span class="st">'o-'</span>, color<span class="op">=</span><span class="st">"green"</span>,</span>
-<span id="cb14-432"><a href="#cb14-432" aria-hidden="true" tabindex="-1"></a>         label<span class="op">=</span><span class="st">"Score by cross-validation"</span>)</span>
-<span id="cb14-433"><a href="#cb14-433" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb14-434"><a href="#cb14-434" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb14-435"><a href="#cb14-435" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-436"><a href="#cb14-436" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-437"><a href="#cb14-437" aria-hidden="true" tabindex="-1"></a>La courbe d'apprentissage sur les données d'entrainement vaut $1$ puis diminue légèrement plus le nombre de données augmente. Nous avons déjà vu que si nous testons nos données d'apprentissage nous apprenons très bien dans le cas où la profondeur de l'arbre est assez élevé, et ici, nous avons pris la profondeur qui minimise l'erreur c'est donc cohérent. De plus, le score diminue lorsque le nombre de données augmente car plus il y a de données d'apprentissage plus il y a de risque de sur-apprentissage et donc l'erreur n'est pas nulle.</span>
+<span id="cb14-396"><a href="#cb14-396" aria-hidden="true" tabindex="-1"></a>Pour cette question, nous allons tracer les courbes d'apprentissage en fonction de la taille de l'ensemble d'entrainement. Les courbes d'apprentissage nous donne une valeur du score pour des ensembles de tailles différentes. Nous tracerons les courbes avec les "intervalles de confiance", c'est-à-dire la dispersion des scores lors de la validation croisée. </span>
+<span id="cb14-397"><a href="#cb14-397" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-400"><a href="#cb14-400" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb14-401"><a href="#cb14-401" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-align: center</span></span>
+<span id="cb14-402"><a href="#cb14-402" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">12</span>)</span>
+<span id="cb14-403"><a href="#cb14-403" aria-hidden="true" tabindex="-1"></a><span class="co"># modèle d'apprentissage</span></span>
+<span id="cb14-404"><a href="#cb14-404" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-405"><a href="#cb14-405" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> digits.data</span>
+<span id="cb14-406"><a href="#cb14-406" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> digits.target</span>
+<span id="cb14-407"><a href="#cb14-407" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'entropy'</span>, max_depth<span class="op">=</span>best_depth)</span>
+<span id="cb14-408"><a href="#cb14-408" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-409"><a href="#cb14-409" aria-hidden="true" tabindex="-1"></a><span class="co"># Générer la courbe d'apprentissage</span></span>
+<span id="cb14-410"><a href="#cb14-410" aria-hidden="true" tabindex="-1"></a>n_samples, train_scores, test_scores <span class="op">=</span> learning_curve(model, X, y, cv<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb14-411"><a href="#cb14-411" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-412"><a href="#cb14-412" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculer les moyennes et les écarts types des scores d'entraînement</span></span>
+<span id="cb14-413"><a href="#cb14-413" aria-hidden="true" tabindex="-1"></a><span class="co"># et de test</span></span>
+<span id="cb14-414"><a href="#cb14-414" aria-hidden="true" tabindex="-1"></a>train_scores_mean <span class="op">=</span> np.mean(train_scores, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb14-415"><a href="#cb14-415" aria-hidden="true" tabindex="-1"></a>train_scores_std <span class="op">=</span> np.std(train_scores, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb14-416"><a href="#cb14-416" aria-hidden="true" tabindex="-1"></a>test_scores_mean <span class="op">=</span> np.mean(test_scores, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb14-417"><a href="#cb14-417" aria-hidden="true" tabindex="-1"></a>test_scores_std <span class="op">=</span> np.std(test_scores, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb14-418"><a href="#cb14-418" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-419"><a href="#cb14-419" aria-hidden="true" tabindex="-1"></a><span class="co"># Tracer la courbe d'apprentissage avec intervalle de confiance</span></span>
+<span id="cb14-420"><a href="#cb14-420" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
+<span id="cb14-421"><a href="#cb14-421" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Learning curve"</span>)</span>
+<span id="cb14-422"><a href="#cb14-422" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Training set size"</span>)</span>
+<span id="cb14-423"><a href="#cb14-423" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Score"</span>)</span>
+<span id="cb14-424"><a href="#cb14-424" aria-hidden="true" tabindex="-1"></a>plt.grid()</span>
+<span id="cb14-425"><a href="#cb14-425" aria-hidden="true" tabindex="-1"></a>plt.fill_between(n_samples, train_scores_mean <span class="op">-</span> train_scores_std,</span>
+<span id="cb14-426"><a href="#cb14-426" aria-hidden="true" tabindex="-1"></a>                 train_scores_mean <span class="op">+</span> train_scores_std, alpha<span class="op">=</span><span class="fl">0.1</span>,</span>
+<span id="cb14-427"><a href="#cb14-427" aria-hidden="true" tabindex="-1"></a>                 color<span class="op">=</span><span class="st">"red"</span>)</span>
+<span id="cb14-428"><a href="#cb14-428" aria-hidden="true" tabindex="-1"></a>plt.fill_between(n_samples, test_scores_mean <span class="op">-</span> test_scores_std,</span>
+<span id="cb14-429"><a href="#cb14-429" aria-hidden="true" tabindex="-1"></a>                 test_scores_mean <span class="op">+</span> test_scores_std, alpha<span class="op">=</span><span class="fl">0.1</span>,</span>
+<span id="cb14-430"><a href="#cb14-430" aria-hidden="true" tabindex="-1"></a>                 color<span class="op">=</span><span class="st">"green"</span>)</span>
+<span id="cb14-431"><a href="#cb14-431" aria-hidden="true" tabindex="-1"></a>plt.plot(n_samples, train_scores_mean, <span class="st">'o-'</span>, color<span class="op">=</span><span class="st">"red"</span>,</span>
+<span id="cb14-432"><a href="#cb14-432" aria-hidden="true" tabindex="-1"></a>         label<span class="op">=</span><span class="st">"Train score"</span>)</span>
+<span id="cb14-433"><a href="#cb14-433" aria-hidden="true" tabindex="-1"></a>plt.plot(n_samples, test_scores_mean, <span class="st">'o-'</span>, color<span class="op">=</span><span class="st">"green"</span>,</span>
+<span id="cb14-434"><a href="#cb14-434" aria-hidden="true" tabindex="-1"></a>         label<span class="op">=</span><span class="st">"Score by cross-validation"</span>)</span>
+<span id="cb14-435"><a href="#cb14-435" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb14-436"><a href="#cb14-436" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb14-437"><a href="#cb14-437" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb14-438"><a href="#cb14-438" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-439"><a href="#cb14-439" aria-hidden="true" tabindex="-1"></a>Concernant la courbe d'apprentissage sur les données lors de la validation croisée, nous observons une augmentation du score lorsque le nombre de données d'entrainement augmente. En effet, plus on a de données d'entrainement, plus on apprend et donc le risque d'erreur diminue. À l'origine de la courbe nous sommes à $200$ données d'entrainement et le score est inférieure à $0.6$, on est dans le cadre du sous-apprentissage. Il n'y a pas assez de données pour donner des résultats réellement concluant, il y a plus d'erreur commise lors de la fabrication de <span class="in">`y_test`</span>. </span>
+<span id="cb14-439"><a href="#cb14-439" aria-hidden="true" tabindex="-1"></a>La courbe d'apprentissage sur les données d'entrainement vaut $1$ puis diminue légèrement plus le nombre de données augmente. Nous avons déjà vu que si nous testons nos données d'apprentissage nous apprenons très bien dans le cas où la profondeur de l'arbre est assez élevé, et ici, nous avons pris la profondeur qui minimise l'erreur c'est donc cohérent. De plus, le score diminue lorsque le nombre de données augmente car plus il y a de données d'apprentissage plus il y a de risque de sur-apprentissage et donc l'erreur n'est pas nulle.</span>
+<span id="cb14-440"><a href="#cb14-440" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-441"><a href="#cb14-441" aria-hidden="true" tabindex="-1"></a>Concernant la courbe d'apprentissage sur les données lors de la validation croisée, nous observons une augmentation du score lorsque le nombre de données d'entrainement augmente. En effet, plus on a de données d'entrainement, plus on apprend et donc le risque d'erreur diminue. À l'origine de la courbe nous sommes à $200$ données d'entrainement et le score est inférieure à $0.6$, on voit donc que lorsqu'il n'y a pas assez de données nous n'apprenons pas assez. Il y a plus d'erreur commise lors de la fabrication de <span class="in">`y_test`</span>. </span>
+<span id="cb14-442"><a href="#cb14-442" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-443"><a href="#cb14-443" aria-hidden="true" tabindex="-1"></a>Regardons dans le cas où la profondeur d'arbre est plus faible. Prenons 4. </span>
+<span id="cb14-444"><a href="#cb14-444" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-447"><a href="#cb14-447" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb14-448"><a href="#cb14-448" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb14-449"><a href="#cb14-449" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-align: center</span></span>
+<span id="cb14-450"><a href="#cb14-450" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">12</span>)</span>
+<span id="cb14-451"><a href="#cb14-451" aria-hidden="true" tabindex="-1"></a><span class="co"># modèle d'apprentissage</span></span>
+<span id="cb14-452"><a href="#cb14-452" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-453"><a href="#cb14-453" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> digits.data</span>
+<span id="cb14-454"><a href="#cb14-454" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> digits.target</span>
+<span id="cb14-455"><a href="#cb14-455" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> tree.DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'entropy'</span>, max_depth<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb14-456"><a href="#cb14-456" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-457"><a href="#cb14-457" aria-hidden="true" tabindex="-1"></a><span class="co"># Générer la courbe d'apprentissage</span></span>
+<span id="cb14-458"><a href="#cb14-458" aria-hidden="true" tabindex="-1"></a>n_samples, train_scores, test_scores <span class="op">=</span> learning_curve(model, X, y, cv<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb14-459"><a href="#cb14-459" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-460"><a href="#cb14-460" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculer les moyennes et les écarts types des scores d'entraînement</span></span>
+<span id="cb14-461"><a href="#cb14-461" aria-hidden="true" tabindex="-1"></a><span class="co"># et de test</span></span>
+<span id="cb14-462"><a href="#cb14-462" aria-hidden="true" tabindex="-1"></a>train_scores_mean <span class="op">=</span> np.mean(train_scores, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb14-463"><a href="#cb14-463" aria-hidden="true" tabindex="-1"></a>train_scores_std <span class="op">=</span> np.std(train_scores, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb14-464"><a href="#cb14-464" aria-hidden="true" tabindex="-1"></a>test_scores_mean <span class="op">=</span> np.mean(test_scores, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb14-465"><a href="#cb14-465" aria-hidden="true" tabindex="-1"></a>test_scores_std <span class="op">=</span> np.std(test_scores, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb14-466"><a href="#cb14-466" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-467"><a href="#cb14-467" aria-hidden="true" tabindex="-1"></a><span class="co"># Tracer la courbe d'apprentissage avec intervalle de confiance</span></span>
+<span id="cb14-468"><a href="#cb14-468" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
+<span id="cb14-469"><a href="#cb14-469" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Learning curve"</span>)</span>
+<span id="cb14-470"><a href="#cb14-470" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Training set size"</span>)</span>
+<span id="cb14-471"><a href="#cb14-471" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Score"</span>)</span>
+<span id="cb14-472"><a href="#cb14-472" aria-hidden="true" tabindex="-1"></a>plt.grid()</span>
+<span id="cb14-473"><a href="#cb14-473" aria-hidden="true" tabindex="-1"></a>plt.fill_between(n_samples, train_scores_mean <span class="op">-</span> train_scores_std,</span>
+<span id="cb14-474"><a href="#cb14-474" aria-hidden="true" tabindex="-1"></a>                 train_scores_mean <span class="op">+</span> train_scores_std, alpha<span class="op">=</span><span class="fl">0.1</span>,</span>
+<span id="cb14-475"><a href="#cb14-475" aria-hidden="true" tabindex="-1"></a>                 color<span class="op">=</span><span class="st">"red"</span>)</span>
+<span id="cb14-476"><a href="#cb14-476" aria-hidden="true" tabindex="-1"></a>plt.fill_between(n_samples, test_scores_mean <span class="op">-</span> test_scores_std,</span>
+<span id="cb14-477"><a href="#cb14-477" aria-hidden="true" tabindex="-1"></a>                 test_scores_mean <span class="op">+</span> test_scores_std, alpha<span class="op">=</span><span class="fl">0.1</span>,</span>
+<span id="cb14-478"><a href="#cb14-478" aria-hidden="true" tabindex="-1"></a>                 color<span class="op">=</span><span class="st">"green"</span>)</span>
+<span id="cb14-479"><a href="#cb14-479" aria-hidden="true" tabindex="-1"></a>plt.plot(n_samples, train_scores_mean, <span class="st">'o-'</span>, color<span class="op">=</span><span class="st">"red"</span>,</span>
+<span id="cb14-480"><a href="#cb14-480" aria-hidden="true" tabindex="-1"></a>         label<span class="op">=</span><span class="st">"Train score"</span>)</span>
+<span id="cb14-481"><a href="#cb14-481" aria-hidden="true" tabindex="-1"></a>plt.plot(n_samples, test_scores_mean, <span class="st">'o-'</span>, color<span class="op">=</span><span class="st">"green"</span>,</span>
+<span id="cb14-482"><a href="#cb14-482" aria-hidden="true" tabindex="-1"></a>         label<span class="op">=</span><span class="st">"Score by cross-validation"</span>)</span>
+<span id="cb14-483"><a href="#cb14-483" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb14-484"><a href="#cb14-484" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb14-485"><a href="#cb14-485" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-486"><a href="#cb14-486" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-487"><a href="#cb14-487" aria-hidden="true" tabindex="-1"></a>Dans ce cas-là nous remarquons que le score est bien moins bon. Pour les données d'entrainement, nous sommes dans un cas de sous-apprentissage. En effet, seulement 4 coupes sont autorisés pour répartir les données, ce n'est pas suffisant et les données ne sont pas dans les bonnes classes, on obtient un score qui diminue en fonction du nombre de données. Plus on a de données, plus il est difficile de bien les classer avec peu de coupe. </span>
+<span id="cb14-488"><a href="#cb14-488" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-489"><a href="#cb14-489" aria-hidden="true" tabindex="-1"></a>Pour la courbe réalisée à partir de la validation croisée, il est clair que ce n'est pas efficace. Le maximum ne dépasse même pas 0.7 puis redescend ensuite avec le nombre de données. On est encore dans un cas de sous-apprentissage, ce n'est pas étonnant puisque si sur les données d'entrainement nous ne parvenons pas à bien apprendre, sur d'autres données ça ne peut pas être mieux. </span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
