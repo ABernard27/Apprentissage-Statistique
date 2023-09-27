@@ -71,6 +71,7 @@ Nous avons regardé les erreurs pour l'indice de gini et l'entropie sur les donn
 
 ```{python}
 #| echo: FALSE
+#| fig-align: center
 np.random.seed(145)
 dmax = 12
 scores_entropy = np.zeros(dmax)
@@ -163,7 +164,7 @@ Si la condition au noeud $k$ est vérifiée alors on suit la branche de gauche, 
 Voici le début de l'arbre que nous avons obtenu. 
 
 
-<img src='code/arbre/arbre2.png' width=600>
+<center><img src='code/arbre/arbre2.png' width=600></center>
 
 
 Explicitons chaque élément :
@@ -184,6 +185,7 @@ Nous allons à présent créer $n=160$ nouvelles données que nous allons utilis
 
 ```{python}
 #| message: FALSE
+#| fig-align: center
 np.random.seed(145)
 data_test = rand_checkers(40, 40, 40, 40)
 X_test = data_test[:, :2]
@@ -249,6 +251,7 @@ Nous allons ensuite tracer les courbes d'erreurs pour les deux critères sur l'�
 ```{python}
 #| echo: FALSE
 #| message: FALSE
+#| fig-align: center
 np.random.seed(12)
 dmax = 15
 scores_entropy = np.zeros(dmax)
@@ -283,6 +286,7 @@ Nous pouvons maintenant regarder l'erreur sur les données tests, ce qui nous in
 ```{python}
 #| echo: FALSE
 #| message: FALSE
+#| fig-align: center
 np.random.seed(12)
 dmax = 20
 scores_entropy = np.zeros(dmax)
@@ -328,6 +332,7 @@ La fonction va choisir un ensemble d'entrainement et un ensemble de test dans $X
 Nous allons, suite à cela, faire la moyenne de ces valeurs. Ce schéma sera répété plusieurs fois en fonction de la profondeur de l'arbre.
 
 ```{python}
+#| fig-align: center
 np.random.seed(12)
 
 error_ent = []
@@ -367,6 +372,7 @@ Nous obtenons une erreur qui descend jusqu'à environ $0.2$ pour $depth=6$ puis 
 Pour cette question, nous allons tracer les courbes d'apprentissage en fonction de la taille de l'ensemble d'entrainement. Les courbes d'apprentissage nous donne une valeur du score pour des ensembles de tailles différentes. Nous tracerons les courbes avec les "intervalles de confiance", c'est-à-dire la dispersion des scores lors de la validation croisée. 
 
 ```{python}
+#| fig-align: center
 np.random.seed(12)
 # modèle d'apprentissage
 
